@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sovereign Yield Regime Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="hero panel">
+      <div>
+        <div class="badge">Public-data-only macro dashboard</div>
+        <h1>Sovereign Yield Regime Dashboard</h1>
+        <p class="hero-copy">Borrowed from the Larry Lookout pattern, but generalized into a GitHub Pages-ready tool focused on sovereign yields, curve warnings, inflation pressure, and cross-country divergence.</p>
+        <p class="hero-meta mono" id="generatedAt">generated n/a</p>
+      </div>
+      <div class="hero-grid" id="heroGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Regime map</div>
+          <h2>Prescripted warning stack</h2>
+        </div>
+        <div class="pill-row" id="sourcePills"></div>
+      </div>
+      <p class="section-note">Green means normal review cadence. Amber means elevate to the next macro review. Red means the rule set is explicitly warning that sovereign-yield conditions are non-benign and should be reviewed before extending duration or assuming an easier macro backdrop.</p>
+      <div class="regime-grid" id="regimeGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Indicator board</div>
+          <h2>Tracked signals</h2>
+        </div>
+        <div class="badge mono" id="latestObservation">latest n/a</div>
+      </div>
+      <div class="indicator-grid" id="indicatorGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">History</div>
+          <h2>Small-multiple context</h2>
+        </div>
+        <div class="badge mono" id="historyWindow">n/a</div>
+      </div>
+      <div id="historyPlot" class="history-plot" role="img" aria-label="History of sovereign-yield indicators"></div>
+      <p class="section-note">Each small multiple keeps its own native units so yield levels, curve spreads, and dispersion do not get forced onto a misleading common axis.</p>
+    </section>
+
+    <section class="two-up">
+      <section class="panel">
+        <div class="section-head compact">
+          <div>
+            <div class="eyebrow">Policy</div>
+            <h2>Threshold interpretation</h2>
+          </div>
+        </div>
+        <div id="thresholdPolicy" class="stack-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head compact">
+          <div>
+            <div class="eyebrow">Notes</div>
+            <h2>Usage and caveats</h2>
+          </div>
+        </div>
+        <div id="notesList" class="stack-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./dashboard-data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

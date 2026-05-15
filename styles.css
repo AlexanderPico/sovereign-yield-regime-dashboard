@@ -1,0 +1,172 @@
+:root {
+  color-scheme: dark;
+  --bg-0: #07111f;
+  --bg-1: #0d1a2d;
+  --panel: rgba(11, 23, 41, 0.9);
+  --panel-strong: rgba(16, 30, 53, 0.96);
+  --line: rgba(148, 163, 184, 0.18);
+  --text: #e5eefc;
+  --muted: #93a4bf;
+  --good: #22c55e;
+  --watch: #f59e0b;
+  --alarm: #ef4444;
+  --stale: #94a3b8;
+  --accent: #60a5fa;
+  --accent-2: #8b5cf6;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 30%),
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 28%),
+    linear-gradient(180deg, #08111f 0%, #0c1626 45%, #09121d 100%);
+  color: var(--text);
+}
+
+.shell {
+  width: min(1280px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.panel {
+  background: linear-gradient(180deg, rgba(14, 27, 48, 0.96), rgba(9, 19, 34, 0.98));
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(20px);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+  gap: 24px;
+  align-items: start;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3.3rem); margin-bottom: 12px; }
+h2 { font-size: 1.3rem; margin-bottom: 0; }
+.hero-copy, .section-note { color: var(--muted); line-height: 1.55; max-width: 72ch; }
+.hero-meta, .mono { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; }
+.badge, .pill, .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.hero-grid, .regime-grid, .indicator-grid {
+  display: grid;
+  gap: 16px;
+}
+.hero-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.regime-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 18px; }
+.indicator-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.two-up { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+
+.card, .indicator-card, .regime-card, .hero-card, .stack-item {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(18, 31, 52, 0.95), rgba(12, 22, 38, 0.98));
+}
+
+.hero-card, .regime-card, .indicator-card { padding: 18px; }
+.hero-card .value { font-size: 1.65rem; font-weight: 700; margin: 10px 0 6px; }
+.hero-card .note, .indicator-meta, .regime-card p, .indicator-card p { color: var(--muted); }
+.label, .eyebrow { letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.76rem; color: #9fb2cf; }
+.section-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+.section-head.compact { margin-bottom: 18px; }
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+.status-ok { border-color: rgba(34, 197, 94, 0.35); }
+.status-watch { border-color: rgba(245, 158, 11, 0.35); }
+.status-alarm { border-color: rgba(239, 68, 68, 0.4); }
+.status-stale, .status-missing { border-color: rgba(148, 163, 184, 0.3); }
+.tag.status-ok, .pill.status-ok, .hero-card.status-ok .value { color: #86efac; }
+.tag.status-watch, .pill.status-watch, .hero-card.status-watch .value { color: #fbbf24; }
+.tag.status-alarm, .pill.status-alarm, .hero-card.status-alarm .value { color: #f87171; }
+.tag.status-stale, .pill.status-stale, .tag.status-missing, .pill.status-missing { color: #cbd5e1; }
+
+.regime-grid .regime-card { min-height: 220px; }
+.regime-card .headline { font-size: 1.1rem; font-weight: 600; margin: 12px 0; }
+.regime-card .implication {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.indicator-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.indicator-value { font-size: 1.5rem; font-weight: 700; margin-top: 8px; }
+.indicator-meta {
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+  margin: 14px 0;
+}
+.action-callout {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.stack-list { display: grid; gap: 10px; }
+.stack-item { padding: 14px 16px; color: var(--muted); line-height: 1.5; }
+
+.history-plot { overflow-x: auto; }
+.history-svg { width: 100%; min-width: 1120px; height: auto; display: block; }
+.history-bg { fill: rgba(6, 13, 24, 0.7); }
+.history-gridline { stroke: rgba(148, 163, 184, 0.12); stroke-width: 1; }
+.history-axis { stroke: rgba(148, 163, 184, 0.22); stroke-width: 1.2; }
+.history-title, .history-latest, .history-range, .history-date, .history-band-label {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+.history-title { fill: #dce8fb; font-size: 14px; }
+.history-latest { font-size: 16px; font-weight: 700; }
+.history-range, .history-date { fill: #93a4bf; font-size: 11px; }
+.history-band { opacity: 0.12; }
+.history-band.status-ok { fill: var(--good); }
+.history-band.status-watch { fill: var(--watch); }
+.history-band.status-alarm { fill: var(--alarm); }
+.history-band-label { fill: #9fb2cf; font-size: 10px; }
+.history-dot.status-ok { fill: var(--good); }
+.history-dot.status-watch { fill: var(--watch); }
+.history-dot.status-alarm { fill: var(--alarm); }
+.history-dot.status-missing, .history-dot.status-stale { fill: var(--stale); }
+
+@media (max-width: 1100px) {
+  .hero,
+  .two-up,
+  .regime-grid,
+  .indicator-grid,
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .shell { width: min(100vw - 20px, 100%); padding: 20px 0 40px; }
+  .panel { padding: 18px; border-radius: 20px; }
+  .section-head { flex-direction: column; }
+  .pill-row { justify-content: flex-start; }
+}
