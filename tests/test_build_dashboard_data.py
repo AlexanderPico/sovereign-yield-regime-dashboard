@@ -115,3 +115,24 @@ def test_render_dashboard_bundle_emits_assignable_global_js():
     assert bundle.startswith('globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = ')
     assert 'cross_market_dispersion' in bundle
     assert '2026-05-15T12:00:00Z' in bundle
+
+
+def test_repo_docs_and_ci_stay_in_sync_with_supported_series():
+    readme_text = (REPO_ROOT / 'README.md').read_text()
+    ci_workflow_path = REPO_ROOT / '.github' / 'workflows' / 'ci.yml'
+
+    assert ci_workflow_path.exists()
+
+    ci_workflow = ci_workflow_path.read_text()
+    assert 'pull_request:' in ci_workflow
+    assert 'push:' in ci_workflow
+    assert 'python3 -m pip install pytest' in ci_workflow
+    assert 'pytest tests/test_build_dashboard_data.py -q' in ci_workflow
+    assert 'python3 scripts/build_dashboard_data.py' in ci_workflow
+    assert 'node --check app.js' in ci_workflow
+
+    for series_id in module.SERIES_CONFIG:
+        assert f'- `{series_id}`' in readme_text
+
+    assert '.github/workflows/ci.yml' in readme_text
+    assert '.github/workflows/refresh-and-deploy-pages.yml' in readme_text

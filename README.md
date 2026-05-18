@@ -39,7 +39,8 @@ Each indicator maps to:
 - `app.js` — client-side renderer
 - `dashboard-data.js` — generated data bundle consumed by the page
 - `scripts/build_dashboard_data.py` — pulls FRED CSV data and writes `dashboard-data.js`
-- `tests/test_build_dashboard_data.py` — payload/bundle regression tests
+- `tests/test_build_dashboard_data.py` — payload/bundle and repo-contract regression tests
+- `.github/workflows/ci.yml` — push/PR validation for tests, data rebuild, and JS syntax
 - `.github/workflows/refresh-and-deploy-pages.yml` — scheduled GitHub Pages refresh/deploy
 
 ## Local usage
@@ -53,7 +54,17 @@ python3 scripts/build_dashboard_data.py
 Run tests:
 
 ```bash
+python3 -m pip install pytest
 pytest tests/test_build_dashboard_data.py -q
+```
+
+Run the same local validation steps used by CI:
+
+```bash
+python3 -m pip install pytest
+pytest tests/test_build_dashboard_data.py -q
+python3 scripts/build_dashboard_data.py
+node --check app.js
 ```
 
 Open locally:
@@ -91,6 +102,13 @@ All current data comes from public FRED CSV endpoints:
 - `IRLTLT01JPM156N`
 - `IRLTLT01CAM156N`
 - `IRLTLT01AUM156N`
+- `IRLTLT01EZM156N`
+- `IRLTLT01DEM156N`
+
+## Automation
+
+- `.github/workflows/ci.yml` runs the secret-free regression path on `push` and `pull_request`.
+- `.github/workflows/refresh-and-deploy-pages.yml` remains the scheduled/manual Pages refresh path.
 
 ## Guardrails
 
@@ -101,7 +119,6 @@ All current data comes from public FRED CSV endpoints:
 
 ## Next useful expansions
 
-- add Germany / euro area if a reliable public series contract is chosen
 - add a small sovereign-stress basket for selected EM issuers
 - add a markdown export of the current regime snapshot for agent summarization
 - add a second layer of cross-country spread indicators rather than only max-min dispersion
