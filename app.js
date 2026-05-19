@@ -116,36 +116,62 @@
     return `M ${start.x.toFixed(1)} ${start.y.toFixed(1)} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x.toFixed(1)} ${end.y.toFixed(1)}`;
   }
 
+  function valueToAngle(value) {
+    const clamped = Math.max(1, Math.min(100, Number(value) || 1));
+    return -120 + (((clamped - 1) / 99) * 240);
+  }
+
   function renderComposite() {
     const composite = data.composite_regime || {};
     const score = Math.max(1, Math.min(100, Number(composite.score || 1)));
     const status = composite.status || 'missing';
-    const gaugeAngle = -120 + ((score - 1) / 99) * 240;
-    const needle = polarPoint(160, 160, 100, gaugeAngle);
+    const gaugeAngle = valueToAngle(score);
+    const needle = polarPoint(160, 160, 92, gaugeAngle);
     const bandColor = historyStrokeForStatus(status, '#60a5fa');
     const scenarios = composite.scenario_odds || [];
     const biasItems = composite.investment_bias || [];
+    const bandSegments = [
+      { start: 1, end: 24, className: 'meter-band-safe' },
+      { start: 25, end: 44, className: 'meter-band-building' },
+      { start: 45, end: 64, className: 'meter-band-nonbenign' },
+      { start: 65, end: 84, className: 'meter-band-stress' },
+      { start: 85, end: 100, className: 'meter-band-bigprint' },
+    ];
+    const tickValues = [1, 25, 45, 65, 85, 100];
+
+    const segmentPaths = bandSegments.map((segment) => {
+      const startAngle = valueToAngle(segment.start);
+      const endAngle = valueToAngle(segment.end);
+      return `<path d="${describeArc(160, 160, 112, startAngle, endAngle)}" class="meter-arc ${segment.className}" />`;
+    }).join('');
+
+    const tickMarks = tickValues.map((value) => {
+      const angle = valueToAngle(value);
+      const outer = polarPoint(160, 160, 126, angle);
+      const inner = polarPoint(160, 160, 114, angle);
+      const textPoint = polarPoint(160, 160, value === 1 || value === 100 ? 136 : 138, angle);
+      const anchor = value === 1 ? 'start' : value === 100 ? 'end' : 'middle';
+      return `
+        <line x1="${outer.x.toFixed(1)}" y1="${outer.y.toFixed(1)}" x2="${inner.x.toFixed(1)}" y2="${inner.y.toFixed(1)}" class="meter-tick-line" />
+        <text x="${textPoint.x.toFixed(1)}" y="${(textPoint.y + 4).toFixed(1)}" text-anchor="${anchor}">${value}</text>
+      `;
+    }).join('');
+
+    const scoreMarker = polarPoint(160, 160, 112, gaugeAngle);
 
     nodes.compositeBand.textContent = `${composite.band_label || 'n/a'} · ${score}/100`;
     nodes.compositeBand.className = `badge mono ${statusClass(status)}`;
     nodes.compositeMeter.innerHTML = `
       <svg viewBox="0 0 320 220" class="composite-meter-svg" aria-hidden="true">
-        <path d="${describeArc(160, 160, 112, -120, -24)}" class="meter-arc meter-arc-ok" />
-        <path d="${describeArc(160, 160, 112, -24, 24)}" class="meter-arc meter-arc-watch" />
-        <path d="${describeArc(160, 160, 112, 24, 120)}" class="meter-arc meter-arc-alarm" />
-        <path d="${describeArc(160, 160, 84, -120, 120)}" class="meter-arc meter-track" />
-        <g class="meter-ticks">
-          <text x="44" y="173">1</text>
-          <text x="86" y="58">25</text>
-          <text x="154" y="32">50</text>
-          <text x="226" y="58">75</text>
-          <text x="264" y="173">100</text>
-        </g>
+        <path d="${describeArc(160, 160, 86, -120, 120)}" class="meter-arc meter-track" />
+        ${segmentPaths}
+        <g class="meter-ticks">${tickMarks}</g>
+        <circle cx="${scoreMarker.x.toFixed(1)}" cy="${scoreMarker.y.toFixed(1)}" r="7" class="meter-score-marker" style="fill:${escapeHtml(bandColor)}" />
         <line x1="160" y1="160" x2="${needle.x.toFixed(1)}" y2="${needle.y.toFixed(1)}" class="meter-needle" style="stroke:${escapeHtml(bandColor)}" />
         <circle cx="160" cy="160" r="10" class="meter-hub" />
-        <text x="160" y="130" text-anchor="middle" class="meter-title">${escapeHtml(composite.label || 'Sovereign Stress Meter')}</text>
-        <text x="160" y="172" text-anchor="middle" class="meter-score" style="fill:${escapeHtml(bandColor)}">${score}</text>
-        <text x="160" y="194" text-anchor="middle" class="meter-band">${escapeHtml(composite.band_label || 'n/a')}</text>
+        <text x="160" y="116" text-anchor="middle" class="meter-caption">stress score</text>
+        <text x="160" y="166" text-anchor="middle" class="meter-score" style="fill:${escapeHtml(bandColor)}">${score}</text>
+        <text x="160" y="192" text-anchor="middle" class="meter-band">${escapeHtml(composite.band_label || 'n/a')}</text>
       </svg>`;
 
     nodes.scenarioGrid.innerHTML = scenarios.map((item) => `
