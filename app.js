@@ -171,7 +171,7 @@
         <line x1="${needleStart.x.toFixed(1)}" y1="${needleStart.y.toFixed(1)}" x2="${needle.x.toFixed(1)}" y2="${needle.y.toFixed(1)}" class="meter-needle" style="stroke:${escapeHtml(bandColor)}" />
         <circle cx="160" cy="160" r="10" class="meter-hub" />
         <rect x="118" y="136" width="84" height="40" rx="20" class="meter-score-chip" style="stroke:${escapeHtml(bandColor)}" />
-        <text x="160" y="163" text-anchor="middle" class="meter-score">${score}</text>
+        <text x="160" y="169" text-anchor="middle" class="meter-score">${score}</text>
       </svg>`;
 
     nodes.scenarioGrid.innerHTML = scenarios.map((item) => `
