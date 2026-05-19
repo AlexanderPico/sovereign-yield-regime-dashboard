@@ -15,6 +15,7 @@ The twist here is narrower and more generic: sovereign yields, curve shape, brea
 
 Current indicators:
 - US 10Y Treasury yield
+- US 30Y Treasury yield
 - US 2Y/10Y spread
 - US 10Y/3M spread
 - US 10Y breakeven inflation
@@ -96,6 +97,7 @@ To enable Pages in GitHub:
 All current data comes from public FRED CSV endpoints:
 - `DGS10`
 - `DGS2`
+- `DGS30`
 - `T10Y3M`
 - `T10YIE`
 - `IRLTLT01GBM156N`
@@ -122,3 +124,4 @@ All current data comes from public FRED CSV endpoints:
 - add a small sovereign-stress basket for selected EM issuers
 - add a markdown export of the current regime snapshot for agent summarization
 - add a second layer of cross-country spread indicators rather than only max-min dispersion
+- consider a 5Y5Y inflation-expectations or term-premium proxy if a public, stable source improves signal quality without overcomplicating the surface

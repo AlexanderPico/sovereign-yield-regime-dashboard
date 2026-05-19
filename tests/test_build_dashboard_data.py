@@ -17,6 +17,7 @@ def sample_observations():
     return {
         'DGS10': {'series_id': 'DGS10', 'label': 'US 10Y Treasury', 'date': '2026-05-14', 'value': 4.95, 'status': 'present'},
         'DGS2': {'series_id': 'DGS2', 'label': 'US 2Y Treasury', 'date': '2026-05-14', 'value': 4.05, 'status': 'present'},
+        'DGS30': {'series_id': 'DGS30', 'label': 'US 30Y Treasury', 'date': '2026-05-14', 'value': 5.18, 'status': 'present'},
         'T10Y3M': {'series_id': 'T10Y3M', 'label': 'US 10Y - 3M spread', 'date': '2026-05-14', 'value': -0.30, 'status': 'present'},
         'T10YIE': {'series_id': 'T10YIE', 'label': 'US 10Y breakeven', 'date': '2026-05-14', 'value': 3.10, 'status': 'present'},
         'IRLTLT01GBM156N': {'series_id': 'IRLTLT01GBM156N', 'label': 'UK 10Y', 'date': '2026-03-01', 'value': 5.35, 'status': 'present'},
@@ -39,6 +40,11 @@ def sample_history():
             {'date': '2026-05-12', 'value': 3.95, 'status': 'present'},
             {'date': '2026-05-13', 'value': 4.00, 'status': 'present'},
             {'date': '2026-05-14', 'value': 4.05, 'status': 'present'},
+        ],
+        'DGS30': [
+            {'date': '2026-05-12', 'value': 4.88, 'status': 'watch'},
+            {'date': '2026-05-13', 'value': 5.02, 'status': 'watch'},
+            {'date': '2026-05-14', 'value': 5.18, 'status': 'alarm'},
         ],
         'T10Y3M': [
             {'date': '2026-05-12', 'value': -0.10, 'status': 'watch'},
@@ -94,13 +100,22 @@ def test_build_dashboard_payload_flags_alarm_regime_and_summary_counts():
     assert payload['summary']['alarm_count'] >= 4
     assert payload['summary']['warning_count'] >= 2
     assert payload['hero_cards'][0]['label'] == 'Overall regime'
+    assert payload['hero_cards'][1]['label'] == 'US 10Y'
+    assert payload['hero_cards'][2]['label'] == 'US 30Y'
     assert 'inflation' in payload['regime_cards'][0]['drivers'].lower()
 
     keys = {item['key'] for item in payload['indicators']}
     assert 'us_10y_yield' in keys
+    assert 'us_30y_yield' in keys
     assert 'cross_market_dispersion' in keys
     assert 'euro_area_10y_yield' in keys
     assert 'germany_10y_yield' in keys
+
+    us30 = next(item for item in payload['indicators'] if item['key'] == 'us_30y_yield')
+    assert us30['status'] == 'alarm'
+
+    history_series = {item['key']: item for item in payload['history']['series']}
+    assert history_series['us_30y_yield']['latest_status'] == 'alarm'
 
 
 def test_render_dashboard_bundle_emits_assignable_global_js():
@@ -113,6 +128,7 @@ def test_render_dashboard_bundle_emits_assignable_global_js():
     bundle = module.render_dashboard_bundle(payload)
 
     assert bundle.startswith('globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = ')
+    assert 'us_30y_yield' in bundle
     assert 'cross_market_dispersion' in bundle
     assert '2026-05-15T12:00:00Z' in bundle
 

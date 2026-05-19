@@ -1,58 +1,58 @@
 globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
-  "generated_at": "2026-05-15T22:26:36Z",
+  "generated_at": "2026-05-19T18:07:50Z",
   "title": "Sovereign Yield Regime Dashboard",
   "summary": {
     "overall_status": "alarm",
-    "alarm_count": 1,
-    "warning_count": 4,
-    "indicator_count": 11,
-    "latest_observation": "2026-05-15"
+    "alarm_count": 2,
+    "warning_count": 5,
+    "indicator_count": 12,
+    "latest_observation": "2026-05-18"
   },
   "hero_cards": [
     {
       "label": "Overall regime",
       "value": "ALARM",
-      "note": "1 alarm \u00b7 4 watch",
+      "note": "2 alarm \u00b7 5 watch",
       "status": "alarm"
     },
     {
       "label": "US 10Y",
-      "value": "4.47%",
+      "value": "4.59%",
       "note": "Primary duration-pressure anchor",
       "status": "watch"
     },
     {
-      "label": "2s10s",
-      "value": "47 bp",
-      "note": "Recession vs bear-steepener lens",
-      "status": "ok"
+      "label": "US 30Y",
+      "value": "5.12%",
+      "note": "Long-end fiscal and term-premium stress anchor",
+      "status": "alarm"
     },
     {
-      "label": "Dispersion",
-      "value": "244 bp",
-      "note": "Max minus min 10Y across tracked sovereigns including euro area and Germany",
-      "status": "ok"
+      "label": "2s10s",
+      "value": "50 bp",
+      "note": "Recession vs bear-steepener lens",
+      "status": "watch"
     }
   ],
   "regime_cards": [
     {
       "label": "Overall sovereign-yield regime",
       "status": "alarm",
-      "headline": "Escalated sovereign-yield warning stack: 1 alarm signals and 4 watch signals are active.",
+      "headline": "Escalated sovereign-yield warning stack: 2 alarm signals and 5 watch signals are active.",
       "drivers": "Inflation pressure, curve shape, and cross-market divergence are combined into a transparent warning stack.",
       "implication": "Use this as a review trigger, not a trading signal. Red means the dashboard is explicitly warning that duration and macro assumptions need review."
     },
     {
       "label": "Inflation and duration pressure",
-      "status": "watch",
-      "headline": "Inflation-pressure regime is elevated.",
+      "status": "alarm",
+      "headline": "Inflation-pressure regime is in alarm.",
       "drivers": "US 10Y level, breakeven inflation, UK 10Y, Australia 10Y, euro area 10Y, and Germany 10Y act as the main inflation-and-duration composite.",
       "implication": "Higher readings argue against easy disinflation narratives and against assuming lower discount rates are imminent."
     },
     {
       "label": "Curve and growth warning",
-      "status": "ok",
-      "headline": "Curve-warning regime is contained.",
+      "status": "watch",
+      "headline": "Curve-warning regime is elevated.",
       "drivers": "US 2s10s and 10Y/3M spreads separate benign normalization from inversion or high-rate bear steepening.",
       "implication": "Watch for recession risk on one side and non-benign steepening on the other; do not treat every steep curve as healthy growth."
     },
@@ -68,11 +68,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     {
       "key": "us_10y_yield",
       "label": "US 10Y Treasury yield",
-      "value": 4.47,
-      "value_label": "4.47%",
+      "value": 4.59,
+      "value_label": "4.59%",
       "unit": "%",
       "status": "watch",
-      "latest_date": "2026-05-14",
+      "latest_date": "2026-05-15",
       "why": "High long-end U.S. rates tighten global duration conditions and raise the hurdle for risk assets, housing, and refinancing.",
       "action": "If red persists, assume duration is expensive: shorten review horizons, avoid assuming lower discount rates, and revisit rate-sensitive exposure.",
       "thresholds": "OK < 4.25%; watch 4.25\u20134.74%; alarm \u2265 4.75%.",
@@ -102,8 +102,51 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         {
           "series_id": "DGS10",
           "label": "US 10Y Treasury yield",
-          "date": "2026-05-14",
-          "value": 4.47,
+          "date": "2026-05-15",
+          "value": 4.59,
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "key": "us_30y_yield",
+      "label": "US 30Y Treasury yield",
+      "value": 5.12,
+      "value_label": "5.12%",
+      "unit": "%",
+      "status": "alarm",
+      "latest_date": "2026-05-15",
+      "why": "The 30Y is a cleaner long-end fiscal-duration and term-premium stress gauge than the 10Y alone when bond vigilante pressure is building.",
+      "action": "If red, treat long-duration discount-rate assumptions as fragile and review any thesis that depends on orderly long-end funding conditions.",
+      "thresholds": "OK < 4.75%; watch 4.75\u20135.09%; alarm \u2265 5.10%.",
+      "source": "FRED DGS30",
+      "cadence": "Daily market close",
+      "bands": [
+        {
+          "label": "Alarm \u2265 5.10%",
+          "status": "alarm",
+          "from": 5.1,
+          "to": null
+        },
+        {
+          "label": "Watch 4.75% to 5.10%",
+          "status": "watch",
+          "from": 4.75,
+          "to": 5.1
+        },
+        {
+          "label": "OK < 4.75%",
+          "status": "ok",
+          "from": null,
+          "to": 4.75
+        }
+      ],
+      "components": [
+        {
+          "series_id": "DGS30",
+          "label": "US 30Y Treasury yield",
+          "date": "2026-05-15",
+          "value": 5.12,
           "status": "present"
         }
       ]
@@ -111,11 +154,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     {
       "key": "us_2s10s_spread",
       "label": "US 2Y/10Y spread",
-      "value": 0.46999999999999975,
-      "value_label": "47 bp",
+      "value": 0.5,
+      "value_label": "50 bp",
       "unit": "pp",
-      "status": "ok",
-      "latest_date": "2026-05-14",
+      "status": "watch",
+      "latest_date": "2026-05-15",
       "why": "A deep inversion points to recession or policy-error risk; a steep bear move with high long rates points to fiscal-duration stress.",
       "action": "If alarmed, review whether the macro setup is recessionary inversion or bear steepening before adding cyclical or long-duration exposure.",
       "thresholds": "Watch if spread \u2264 0 bp, or \u2265 50 bp with 10Y \u2265 4.25%; alarm if \u2264 -50 bp, or \u2265 100 bp with 10Y \u2265 4.75%.",
@@ -157,15 +200,15 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         {
           "series_id": "DGS10",
           "label": "US 10Y Treasury yield",
-          "date": "2026-05-14",
-          "value": 4.47,
+          "date": "2026-05-15",
+          "value": 4.59,
           "status": "present"
         },
         {
           "series_id": "DGS2",
           "label": "US 2Y Treasury yield",
-          "date": "2026-05-14",
-          "value": 4.0,
+          "date": "2026-05-15",
+          "value": 4.09,
           "status": "present"
         }
       ]
@@ -173,11 +216,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     {
       "key": "us_10y_3m_spread",
       "label": "US 10Y/3M spread",
-      "value": 0.9,
-      "value_label": "90 bp",
+      "value": 0.93,
+      "value_label": "93 bp",
       "unit": "pp",
       "status": "ok",
-      "latest_date": "2026-05-15",
+      "latest_date": "2026-05-18",
       "why": "This is a classic recession-warning lens, but a sharp positive steepener alongside high 10Y rates can also flag renewed inflation or funding stress.",
       "action": "If alarmed, assume the curve is sending a non-benign macro signal and review whether you are underweight growth scare or inflation repricing risk.",
       "thresholds": "Watch if spread \u2264 0 bp, or \u2265 100 bp with 10Y \u2265 4.50%; alarm if \u2264 -25 bp, or \u2265 125 bp with 10Y \u2265 4.75%.",
@@ -219,8 +262,8 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         {
           "series_id": "T10Y3M",
           "label": "US 10Y minus 3M spread",
-          "date": "2026-05-15",
-          "value": 0.9,
+          "date": "2026-05-18",
+          "value": 0.93,
           "status": "present"
         }
       ]
@@ -228,11 +271,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     {
       "key": "us_10y_breakeven",
       "label": "US 10Y breakeven inflation",
-      "value": 2.49,
-      "value_label": "2.49%",
+      "value": 2.48,
+      "value_label": "2.48%",
       "unit": "%",
       "status": "ok",
-      "latest_date": "2026-05-15",
+      "latest_date": "2026-05-18",
       "why": "Breakevens reflect market-implied inflation compensation; persistent rises strengthen the case that nominal-yield pressure is inflationary rather than just growth-led.",
       "action": "If red, treat nominal-rate spikes as inflation-confirming until disproven and be skeptical of easy cuts narratives.",
       "thresholds": "OK < 2.60%; watch 2.60\u20132.99%; alarm \u2265 3.00%.",
@@ -262,8 +305,8 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         {
           "series_id": "T10YIE",
           "label": "US 10Y breakeven inflation",
-          "date": "2026-05-15",
-          "value": 2.49,
+          "date": "2026-05-18",
+          "value": 2.48,
           "status": "present"
         }
       ]
@@ -533,7 +576,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
       "value_label": "244 bp",
       "unit": "pp",
       "status": "ok",
-      "latest_date": "2026-05-14",
+      "latest_date": "2026-05-15",
       "why": "A wide developed-market yield spread says sovereign markets are not moving as one block; policy, inflation, or fiscal stress is becoming more country-specific.",
       "action": "If red, stop using a single \u201cglobal rates\u201d story. Review country-specific risk separately and raise the bar for cross-market analogies.",
       "thresholds": "OK < 250 bp; watch 250\u2013324 bp; alarm \u2265 325 bp.",
@@ -563,8 +606,8 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         {
           "series_id": "DGS10",
           "label": "US 10Y Treasury yield",
-          "date": "2026-05-14",
-          "value": 4.47,
+          "date": "2026-05-15",
+          "value": 4.59,
           "status": "present"
         },
         {
@@ -614,13 +657,14 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
   ],
   "history": {
     "start_date": "2025-03-01",
-    "end_date": "2026-05-15",
+    "end_date": "2026-05-18",
     "series": [
       {
         "key": "us_10y_yield",
         "label": "US 10Y Treasury yield",
         "unit": "%",
         "color": "#60a5fa",
+        "latest_status": "watch",
         "bands": [
           {
             "label": "Alarm \u2265 4.75%",
@@ -642,16 +686,6 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
           }
         ],
         "points": [
-          {
-            "date": "2025-03-21",
-            "value": 4.25,
-            "status": "watch"
-          },
-          {
-            "date": "2025-03-24",
-            "value": 4.34,
-            "status": "watch"
-          },
           {
             "date": "2025-03-25",
             "value": 4.31,
@@ -2081,6 +2115,1475 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
             "date": "2026-05-14",
             "value": 4.47,
             "status": "watch"
+          },
+          {
+            "date": "2026-05-15",
+            "value": 4.59,
+            "status": "watch"
+          }
+        ]
+      },
+      {
+        "key": "us_30y_yield",
+        "label": "US 30Y Treasury yield",
+        "unit": "%",
+        "color": "#c084fc",
+        "latest_status": "alarm",
+        "bands": [
+          {
+            "label": "Alarm \u2265 5.10%",
+            "status": "alarm",
+            "from": 5.1,
+            "to": null
+          },
+          {
+            "label": "Watch 4.75% to 5.10%",
+            "status": "watch",
+            "from": 4.75,
+            "to": 5.1
+          },
+          {
+            "label": "OK < 4.75%",
+            "status": "ok",
+            "from": null,
+            "to": 4.75
+          }
+        ],
+        "points": [
+          {
+            "date": "2025-03-25",
+            "value": 4.65,
+            "status": "ok"
+          },
+          {
+            "date": "2025-03-26",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-03-27",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-03-28",
+            "value": 4.64,
+            "status": "ok"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 4.59,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-01",
+            "value": 4.52,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-02",
+            "value": 4.54,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-03",
+            "value": 4.49,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-04",
+            "value": 4.41,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-07",
+            "value": 4.58,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-08",
+            "value": 4.71,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-09",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-10",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-11",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-14",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-15",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-16",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-17",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-21",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-22",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-23",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-24",
+            "value": 4.77,
+            "status": "watch"
+          },
+          {
+            "date": "2025-04-25",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-28",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-29",
+            "value": 4.64,
+            "status": "ok"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 4.66,
+            "status": "ok"
+          },
+          {
+            "date": "2025-05-01",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-05-02",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-05",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-06",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-07",
+            "value": 4.77,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-08",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-09",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-12",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-13",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-14",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-15",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-16",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-19",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-20",
+            "value": 4.96,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-21",
+            "value": 5.08,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-22",
+            "value": 5.05,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-23",
+            "value": 5.04,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-27",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-28",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-29",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-02",
+            "value": 4.99,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-03",
+            "value": 4.98,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-04",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-05",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-06",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-09",
+            "value": 4.95,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-10",
+            "value": 4.93,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-11",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-12",
+            "value": 4.84,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-13",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-16",
+            "value": 4.96,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-17",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-18",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-20",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-23",
+            "value": 4.87,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-24",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-25",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-26",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-27",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-01",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-02",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-03",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-07",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-08",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-09",
+            "value": 4.87,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-10",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-11",
+            "value": 4.96,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-14",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-15",
+            "value": 5.01,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-16",
+            "value": 5.01,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-17",
+            "value": 5.01,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-18",
+            "value": 5.0,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-21",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-22",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-23",
+            "value": 4.95,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-24",
+            "value": 4.96,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-25",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-28",
+            "value": 4.96,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-29",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-30",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-01",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-04",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-05",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-06",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-07",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-08",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-11",
+            "value": 4.84,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-12",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-13",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-14",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-15",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-18",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-19",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-20",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-21",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-22",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-25",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-26",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-27",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-28",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-02",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-03",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-04",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-05",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-08",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-09",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-10",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-11",
+            "value": 4.65,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-12",
+            "value": 4.68,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-15",
+            "value": 4.66,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-16",
+            "value": 4.65,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-17",
+            "value": 4.66,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-18",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-19",
+            "value": 4.75,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-22",
+            "value": 4.77,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-23",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-24",
+            "value": 4.76,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-25",
+            "value": 4.75,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-26",
+            "value": 4.77,
+            "status": "watch"
+          },
+          {
+            "date": "2025-09-29",
+            "value": 4.71,
+            "status": "ok"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-01",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-02",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-03",
+            "value": 4.71,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-06",
+            "value": 4.76,
+            "status": "watch"
+          },
+          {
+            "date": "2025-10-07",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-08",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-09",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-10",
+            "value": 4.63,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-14",
+            "value": 4.62,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-15",
+            "value": 4.64,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-16",
+            "value": 4.58,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-17",
+            "value": 4.6,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-20",
+            "value": 4.58,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-21",
+            "value": 4.55,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-22",
+            "value": 4.54,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-23",
+            "value": 4.58,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-24",
+            "value": 4.59,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-27",
+            "value": 4.57,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-28",
+            "value": 4.55,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-29",
+            "value": 4.61,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-30",
+            "value": 4.65,
+            "status": "ok"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 4.67,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-03",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-04",
+            "value": 4.67,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-05",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-06",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-07",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-10",
+            "value": 4.71,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-12",
+            "value": 4.67,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-13",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-14",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-17",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-18",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-19",
+            "value": 4.75,
+            "status": "watch"
+          },
+          {
+            "date": "2025-11-20",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-21",
+            "value": 4.71,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-24",
+            "value": 4.68,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-25",
+            "value": 4.67,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-26",
+            "value": 4.64,
+            "status": "ok"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 4.67,
+            "status": "ok"
+          },
+          {
+            "date": "2025-12-01",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-12-02",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2025-12-03",
+            "value": 4.73,
+            "status": "ok"
+          },
+          {
+            "date": "2025-12-04",
+            "value": 4.76,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-05",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-08",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-09",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-10",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-11",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-12",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-15",
+            "value": 4.84,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-16",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-17",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-18",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-19",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-22",
+            "value": 4.84,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-23",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-24",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-26",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-29",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-30",
+            "value": 4.81,
+            "status": "watch"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 4.84,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-02",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-05",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-06",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-07",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-08",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-09",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-12",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-13",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-14",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-15",
+            "value": 4.79,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-16",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-20",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-21",
+            "value": 4.87,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-22",
+            "value": 4.84,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-23",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-26",
+            "value": 4.8,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-27",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-28",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-29",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 4.87,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-02",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-03",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-04",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-05",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-06",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-09",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-10",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-11",
+            "value": 4.82,
+            "status": "watch"
+          },
+          {
+            "date": "2026-02-12",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-13",
+            "value": 4.69,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-17",
+            "value": 4.68,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-18",
+            "value": 4.71,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-19",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-20",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-23",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-24",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-25",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-26",
+            "value": 4.67,
+            "status": "ok"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 4.64,
+            "status": "ok"
+          },
+          {
+            "date": "2026-03-02",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2026-03-03",
+            "value": 4.7,
+            "status": "ok"
+          },
+          {
+            "date": "2026-03-04",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2026-03-05",
+            "value": 4.74,
+            "status": "ok"
+          },
+          {
+            "date": "2026-03-06",
+            "value": 4.77,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-09",
+            "value": 4.72,
+            "status": "ok"
+          },
+          {
+            "date": "2026-03-10",
+            "value": 4.78,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-11",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-12",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-13",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-16",
+            "value": 4.86,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-17",
+            "value": 4.85,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-18",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-19",
+            "value": 4.83,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-20",
+            "value": 4.96,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-23",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-24",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-25",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-26",
+            "value": 4.93,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-27",
+            "value": 4.98,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-30",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-01",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-02",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-03",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-06",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-07",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-08",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-09",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-10",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-13",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-14",
+            "value": 4.87,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-15",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-16",
+            "value": 4.93,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-17",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-20",
+            "value": 4.88,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-21",
+            "value": 4.89,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-22",
+            "value": 4.9,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-23",
+            "value": 4.92,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-24",
+            "value": 4.91,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-27",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-28",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-29",
+            "value": 4.98,
+            "status": "watch"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 4.98,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-01",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-04",
+            "value": 5.02,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-05",
+            "value": 4.98,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-06",
+            "value": 4.94,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-07",
+            "value": 4.97,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-08",
+            "value": 4.95,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-11",
+            "value": 4.98,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-12",
+            "value": 5.03,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-13",
+            "value": 5.03,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-14",
+            "value": 5.02,
+            "status": "watch"
+          },
+          {
+            "date": "2026-05-15",
+            "value": 5.12,
+            "status": "alarm"
           }
         ]
       },
@@ -2089,6 +3592,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "US 2Y/10Y spread",
         "unit": "pp",
         "color": "#f59e0b",
+        "latest_status": "watch",
         "bands": [
           {
             "label": "Alarm < -50 bp",
@@ -2123,1444 +3627,1439 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         ],
         "points": [
           {
-            "date": "2025-03-21",
-            "value": 0.31000000000000005,
-            "status": "present"
-          },
-          {
-            "date": "2025-03-24",
-            "value": 0.2999999999999998,
-            "status": "present"
-          },
-          {
             "date": "2025-03-25",
             "value": 0.34999999999999964,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-03-26",
             "value": 0.36999999999999966,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-03-27",
             "value": 0.4099999999999997,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-03-28",
             "value": 0.37999999999999945,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-03-31",
             "value": 0.3400000000000003,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-01",
             "value": 0.2999999999999998,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-02",
             "value": 0.29000000000000004,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-03",
             "value": 0.34999999999999964,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-04",
             "value": 0.3299999999999996,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-07",
             "value": 0.4200000000000004,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-08",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-09",
             "value": 0.4299999999999997,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-04-10",
             "value": 0.5600000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-11",
             "value": 0.5200000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-14",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-15",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-16",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-17",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-21",
             "value": 0.6699999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-22",
             "value": 0.6500000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-23",
             "value": 0.5900000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-24",
             "value": 0.5500000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-25",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-28",
             "value": 0.5600000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-29",
             "value": 0.5400000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-30",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-01",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-02",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-05",
             "value": 0.5300000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-06",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-07",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-08",
             "value": 0.4700000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-09",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-12",
             "value": 0.4700000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-13",
             "value": 0.47000000000000064,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-14",
             "value": 0.4800000000000004,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-15",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-16",
             "value": 0.44999999999999973,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-19",
             "value": 0.48999999999999977,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-05-20",
             "value": 0.5100000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-21",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-22",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-23",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-27",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-28",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-29",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-05-30",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-02",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-03",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-04",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-05",
             "value": 0.4800000000000004,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-06",
             "value": 0.46999999999999975,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-09",
             "value": 0.4800000000000004,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-10",
             "value": 0.45999999999999996,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-11",
             "value": 0.4700000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-12",
             "value": 0.4600000000000004,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-13",
             "value": 0.4500000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-16",
             "value": 0.48999999999999977,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-17",
             "value": 0.44999999999999973,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-18",
             "value": 0.43999999999999995,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-20",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-06-23",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-24",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-25",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-26",
             "value": 0.5599999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-27",
             "value": 0.56,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-30",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-01",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-02",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-03",
             "value": 0.46999999999999975,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-07",
             "value": 0.5000000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-08",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-09",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-10",
             "value": 0.48999999999999977,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-11",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-14",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-15",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-16",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-17",
             "value": 0.5599999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-18",
             "value": 0.5600000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-21",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-22",
             "value": 0.5199999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-23",
             "value": 0.5200000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-24",
             "value": 0.5199999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-25",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-28",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-29",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-30",
             "value": 0.43999999999999995,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-07-31",
             "value": 0.43000000000000016,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-08-01",
             "value": 0.5400000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-04",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-05",
             "value": 0.49999999999999956,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-08-06",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-07",
             "value": 0.5100000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-08",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-11",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-12",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-13",
             "value": 0.5700000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-14",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-15",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-18",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-19",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-20",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-21",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-22",
             "value": 0.5799999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-25",
             "value": 0.5500000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-26",
             "value": 0.6499999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-27",
             "value": 0.6500000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-28",
             "value": 0.5999999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-29",
             "value": 0.6400000000000006,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-02",
             "value": 0.6200000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-03",
             "value": 0.6099999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-04",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-05",
             "value": 0.5899999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-08",
             "value": 0.5599999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-09",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-10",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-11",
             "value": 0.48999999999999977,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-09-12",
             "value": 0.49999999999999956,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-09-15",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-16",
             "value": 0.5300000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-17",
             "value": 0.5399999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-18",
             "value": 0.5400000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-19",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-22",
             "value": 0.5400000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-23",
             "value": 0.5900000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-24",
             "value": 0.5900000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-25",
             "value": 0.5399999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-26",
             "value": 0.5700000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-29",
             "value": 0.5200000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-30",
             "value": 0.56,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-01",
             "value": 0.5700000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-02",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-03",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-06",
             "value": 0.5799999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-07",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-08",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-09",
             "value": 0.5399999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-10",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-14",
             "value": 0.5500000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-15",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-16",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-17",
             "value": 0.5599999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-20",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-21",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-22",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-23",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-24",
             "value": 0.5399999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-27",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-28",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-29",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2025-10-30",
             "value": 0.5000000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-31",
             "value": 0.5100000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-03",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-04",
             "value": 0.5199999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-05",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-06",
             "value": 0.5400000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-07",
             "value": 0.5600000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-10",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-12",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-13",
             "value": 0.5300000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-14",
             "value": 0.5199999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-17",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-18",
             "value": 0.54,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-19",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-20",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-21",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-24",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-25",
             "value": 0.5799999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-26",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-28",
             "value": 0.5499999999999994,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-01",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-02",
             "value": 0.5800000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-03",
             "value": 0.5699999999999994,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-04",
             "value": 0.5900000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-05",
             "value": 0.5799999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-08",
             "value": 0.6000000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-09",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-10",
             "value": 0.5899999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-11",
             "value": 0.6199999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-12",
             "value": 0.6700000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-15",
             "value": 0.6699999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-16",
             "value": 0.6700000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-17",
             "value": 0.6699999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-18",
             "value": 0.6600000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-19",
             "value": 0.6800000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-22",
             "value": 0.73,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-23",
             "value": 0.6999999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-24",
             "value": 0.6800000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-26",
             "value": 0.6799999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-29",
             "value": 0.6699999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-30",
             "value": 0.6899999999999995,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-31",
             "value": 0.7099999999999995,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-02",
             "value": 0.7200000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-05",
             "value": 0.71,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-06",
             "value": 0.7099999999999995,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-07",
             "value": 0.6800000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-08",
             "value": 0.7000000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-09",
             "value": 0.6399999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-12",
             "value": 0.6500000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-13",
             "value": 0.6499999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-14",
             "value": 0.6400000000000006,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-15",
             "value": 0.6099999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-16",
             "value": 0.6500000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-20",
             "value": 0.6999999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-21",
             "value": 0.6599999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-22",
             "value": 0.6499999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-23",
             "value": 0.6400000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-26",
             "value": 0.6599999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-27",
             "value": 0.7100000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-28",
             "value": 0.6999999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-29",
             "value": 0.7100000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-30",
             "value": 0.7399999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-02",
             "value": 0.7200000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-03",
             "value": 0.7100000000000004,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-04",
             "value": 0.7200000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-05",
             "value": 0.7399999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-06",
             "value": 0.7199999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-09",
             "value": 0.7399999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-10",
             "value": 0.71,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-11",
             "value": 0.6599999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-12",
             "value": 0.6199999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-13",
             "value": 0.6400000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-17",
             "value": 0.6199999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-18",
             "value": 0.6199999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-19",
             "value": 0.6099999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-20",
             "value": 0.6000000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-23",
             "value": 0.6000000000000001,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-24",
             "value": 0.6099999999999999,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-25",
             "value": 0.5999999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-26",
             "value": 0.5999999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-27",
             "value": 0.5900000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-02",
             "value": 0.5799999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-03",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-04",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-05",
             "value": 0.56,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-06",
             "value": 0.5900000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-09",
             "value": 0.56,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-10",
             "value": 0.5800000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-11",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-12",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-13",
             "value": 0.5500000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-16",
             "value": 0.5500000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-17",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-18",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-19",
             "value": 0.45999999999999996,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-03-20",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-23",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-24",
             "value": 0.48999999999999977,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-03-25",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-03-26",
             "value": 0.45999999999999996,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-03-27",
             "value": 0.5600000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-30",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-31",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-01",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-02",
             "value": 0.5199999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-03",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-06",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-07",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-08",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-09",
             "value": 0.5100000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-10",
             "value": 0.49999999999999956,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-04-13",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-14",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-15",
             "value": 0.5300000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-16",
             "value": 0.5400000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-17",
             "value": 0.5499999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-20",
             "value": 0.5399999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-21",
             "value": 0.52,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-22",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-23",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-24",
             "value": 0.5299999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-27",
             "value": 0.5699999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-28",
             "value": 0.5200000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-29",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-30",
             "value": 0.5200000000000005,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-05-01",
             "value": 0.5099999999999998,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-05-04",
             "value": 0.5,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-05-05",
             "value": 0.49999999999999956,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-06",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-07",
             "value": 0.4900000000000002,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-08",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-11",
             "value": 0.46999999999999975,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-12",
             "value": 0.45999999999999996,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-13",
             "value": 0.48,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-14",
             "value": 0.46999999999999975,
-            "status": "present"
+            "status": "ok"
+          },
+          {
+            "date": "2026-05-15",
+            "value": 0.5,
+            "status": "watch"
           }
         ]
       },
@@ -3569,6 +5068,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "US 10Y/3M spread",
         "unit": "pp",
         "color": "#f59e0b",
+        "latest_status": "ok",
         "bands": [
           {
             "label": "Alarm < -25 bp",
@@ -3602,16 +5102,6 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
           }
         ],
         "points": [
-          {
-            "date": "2025-03-21",
-            "value": -0.08,
-            "status": "watch"
-          },
-          {
-            "date": "2025-03-24",
-            "value": 0.01,
-            "status": "ok"
-          },
           {
             "date": "2025-03-25",
             "value": -0.02,
@@ -5046,6 +6536,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
             "date": "2026-05-15",
             "value": 0.9,
             "status": "ok"
+          },
+          {
+            "date": "2026-05-18",
+            "value": 0.93,
+            "status": "ok"
           }
         ]
       },
@@ -5054,6 +6549,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "US 10Y breakeven inflation",
         "unit": "%",
         "color": "#f472b6",
+        "latest_status": "ok",
         "bands": [
           {
             "label": "Alarm \u2265 3.00%",
@@ -5075,16 +6571,6 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
           }
         ],
         "points": [
-          {
-            "date": "2025-03-21",
-            "value": 2.33,
-            "status": "ok"
-          },
-          {
-            "date": "2025-03-24",
-            "value": 2.36,
-            "status": "ok"
-          },
           {
             "date": "2025-03-25",
             "value": 2.35,
@@ -6519,6 +8005,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
             "date": "2026-05-15",
             "value": 2.49,
             "status": "ok"
+          },
+          {
+            "date": "2026-05-18",
+            "value": 2.48,
+            "status": "ok"
           }
         ]
       },
@@ -6527,6 +8018,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "UK 10Y government yield",
         "unit": "%",
         "color": "#fb7185",
+        "latest_status": "watch",
         "bands": [
           {
             "label": "Alarm \u2265 5.25%",
@@ -6625,6 +8117,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "Japan 10Y government yield",
         "unit": "%",
         "color": "#38bdf8",
+        "latest_status": "alarm",
         "bands": [
           {
             "label": "Alarm \u2265 2.50%",
@@ -6723,6 +8216,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "Canada 10Y government yield",
         "unit": "%",
         "color": "#34d399",
+        "latest_status": "ok",
         "bands": [
           {
             "label": "Alarm \u2265 4.50%",
@@ -6826,6 +8320,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "Australia 10Y government yield",
         "unit": "%",
         "color": "#a78bfa",
+        "latest_status": "watch",
         "bands": [
           {
             "label": "Alarm \u2265 5.00%",
@@ -6924,6 +8419,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "Euro area 10Y government yield",
         "unit": "%",
         "color": "#06b6d4",
+        "latest_status": "ok",
         "bands": [
           {
             "label": "Alarm \u2265 3.75%",
@@ -7007,6 +8503,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "Germany 10Y government yield",
         "unit": "%",
         "color": "#84cc16",
+        "latest_status": "watch",
         "bands": [
           {
             "label": "Alarm \u2265 3.25%",
@@ -7105,6 +8602,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
         "label": "Cross-market 10Y dispersion",
         "unit": "pp",
         "color": "#e879f9",
+        "latest_status": "ok",
         "bands": [
           {
             "label": "Alarm \u2265 325 bp",
@@ -7129,77 +8627,77 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
           {
             "date": "2025-03-01",
             "value": 3.1597999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-04-01",
             "value": 3.2662,
-            "status": "present"
+            "status": "alarm"
           },
           {
             "date": "2025-05-01",
             "value": 3.1003999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-06-01",
             "value": 3.1048,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-07-01",
             "value": 3.0473999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-08-01",
             "value": 3.0368999999999997,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-09-01",
             "value": 3.0435000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-10-01",
             "value": 2.9170999999999996,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-11-01",
             "value": 2.6935000000000002,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2025-12-01",
             "value": 2.6590000000000003,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-01-01",
             "value": 2.51,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-02-01",
             "value": 2.648,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-03-01",
             "value": 2.581,
-            "status": "present"
+            "status": "watch"
           },
           {
             "date": "2026-04-01",
             "value": 2.445,
-            "status": "present"
+            "status": "ok"
           },
           {
             "date": "2026-05-01",
             "value": 0.8599999999999999,
-            "status": "present"
+            "status": "ok"
           }
         ]
       }
@@ -7214,6 +8712,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
   "source_status": {
     "DGS10": "present",
     "DGS2": "present",
+    "DGS30": "present",
     "T10Y3M": "present",
     "T10YIE": "present",
     "IRLTLT01GBM156N": "present",
@@ -7232,6 +8731,11 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     {
       "series_id": "DGS2",
       "label": "US 2Y Treasury yield",
+      "cadence": "Daily market close"
+    },
+    {
+      "series_id": "DGS30",
+      "label": "US 30Y Treasury yield",
       "cadence": "Daily market close"
     },
     {
@@ -7278,6 +8782,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
   "notes": [
     "This dashboard is deliberately public-data-only and generic. No personal accounts, balances, credentials, or broker exports are read.",
     "International 10Y series are monthly OECD/FRED feeds, so cross-country comparisons update more slowly than the U.S. daily series.",
+    "US 30Y was added alongside the 10Y because the extra duration can surface fiscal and term-premium stress earlier than a 10Y-only lens.",
     "Euro area and Germany were added as generic European rate anchors so the dashboard is not overfit to Anglo/Japan/commodity-country moves alone.",
     "The value of the dashboard is in the explicit thresholds and action text, not in pretending bond-market interpretation is certain."
   ]

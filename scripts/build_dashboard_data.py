@@ -20,6 +20,7 @@ GLOBAL_NAME = 'SOVEREIGN_YIELD_DASHBOARD_DATA'
 SERIES_CONFIG = {
     'DGS10': {'label': 'US 10Y Treasury yield', 'cadence': 'Daily market close', 'unit': '%', 'color': '#60a5fa'},
     'DGS2': {'label': 'US 2Y Treasury yield', 'cadence': 'Daily market close', 'unit': '%', 'color': '#2dd4bf'},
+    'DGS30': {'label': 'US 30Y Treasury yield', 'cadence': 'Daily market close', 'unit': '%', 'color': '#c084fc'},
     'T10Y3M': {'label': 'US 10Y minus 3M spread', 'cadence': 'Daily market close', 'unit': 'pp', 'color': '#f59e0b'},
     'T10YIE': {'label': 'US 10Y breakeven inflation', 'cadence': 'Daily market close', 'unit': '%', 'color': '#f472b6'},
     'IRLTLT01GBM156N': {'label': 'UK 10Y government yield', 'cadence': 'Monthly', 'unit': '%', 'color': '#fb7185'},
@@ -223,6 +224,7 @@ def build_history_series(key: str, label: str, unit: str, color: str, points: li
         'label': label,
         'unit': unit,
         'color': color,
+        'latest_status': points[-1].get('status', 'missing') if points else 'missing',
         'bands': bands,
         'points': [{'date': point['date'], 'value': point['value'], 'status': point.get('status', 'ok')} for point in points if point.get('value') is not None],
     }
@@ -241,6 +243,7 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
     generated_at = generated_at or utc_now_iso()
     dgs10 = observations['DGS10']
     dgs2 = observations['DGS2']
+    dgs30 = observations['DGS30']
     t10y3m = observations['T10Y3M']
     t10yie = observations['T10YIE']
     uk10 = observations['IRLTLT01GBM156N']
@@ -251,6 +254,7 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
     de10 = observations['IRLTLT01DEM156N']
 
     us10_status = classify_banded(dgs10['value'], watch_high=4.25, alarm_high=4.75)
+    us30_status = classify_banded(dgs30['value'], watch_high=4.75, alarm_high=5.10)
     curve_2s10s = None if dgs10['value'] is None or dgs2['value'] is None else float(dgs10['value']) - float(dgs2['value'])
     curve_2s10s_status = 'ok'
     if curve_2s10s is None:
@@ -279,6 +283,18 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
 
     dispersion_value, dispersion_members = compute_cross_market_dispersion(observations)
     dispersion_status = classify_banded(dispersion_value, watch_high=2.50, alarm_high=3.25)
+    curve_2s10s_history = with_status(
+        build_curve_history(histories['DGS10'], histories['DGS2']),
+        lambda value: 'missing' if value is None else (
+            'alarm' if value <= -0.50 or (value >= 1.00 and (dgs10['value'] or 0) >= 4.75) else
+            'watch' if value <= 0.0 or (value >= 0.50 and (dgs10['value'] or 0) >= 4.25) else
+            'ok'
+        ),
+    )
+    dispersion_history = with_status(
+        build_dispersion_history(histories),
+        lambda value: classify_banded(value, watch_high=2.50, alarm_high=3.25),
+    )
 
     indicators = [
         indicator_dict(
@@ -295,6 +311,21 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
             cadence='Daily market close',
             bands=build_bands('%', (None, 4.25), [(4.25, 4.75)], [(4.75, None)]),
             components=[dgs10],
+        ),
+        indicator_dict(
+            key='us_30y_yield',
+            label='US 30Y Treasury yield',
+            value=dgs30['value'],
+            unit='%',
+            status=us30_status,
+            latest_date=dgs30['date'],
+            why='The 30Y is a cleaner long-end fiscal-duration and term-premium stress gauge than the 10Y alone when bond vigilante pressure is building.',
+            action='If red, treat long-duration discount-rate assumptions as fragile and review any thesis that depends on orderly long-end funding conditions.',
+            thresholds='OK < 4.75%; watch 4.75–5.09%; alarm ≥ 5.10%.',
+            source='FRED DGS30',
+            cadence='Daily market close',
+            bands=build_bands('%', (None, 4.75), [(4.75, 5.10)], [(5.10, None)]),
+            components=[dgs30],
         ),
         indicator_dict(
             key='us_2s10s_spread',
@@ -453,7 +484,7 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
     warning_count = sum(1 for item in indicators if item['status'] in {'watch', 'stale'})
     overall_status = max_status(indicator_statuses)
 
-    inflation_pressure = max_status([us10_status, breakeven_status, uk10_status, au10_status, ez10_status, de10_status])
+    inflation_pressure = max_status([us10_status, us30_status, breakeven_status, uk10_status, au10_status, ez10_status, de10_status])
     growth_warning = max_status([curve_2s10s_status, curve_10y3m_status])
     sovereign_stress = max_status([dispersion_status, uk10_status, jp10_status, ez10_status, de10_status])
 
@@ -502,16 +533,16 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
             'status': us10_status,
         },
         {
+            'label': 'US 30Y',
+            'value': format_value(dgs30['value'], '%'),
+            'note': 'Long-end fiscal and term-premium stress anchor',
+            'status': us30_status,
+        },
+        {
             'label': '2s10s',
             'value': format_value(curve_2s10s, 'pp'),
             'note': 'Recession vs bear-steepener lens',
             'status': curve_2s10s_status,
-        },
-        {
-            'label': 'Dispersion',
-            'value': format_value(dispersion_value, 'pp'),
-            'note': 'Max minus min 10Y across tracked sovereigns including euro area and Germany',
-            'status': dispersion_status,
         },
     ]
 
@@ -529,16 +560,17 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         'end_date': end_date,
         'series': [
             build_history_series('us_10y_yield', 'US 10Y Treasury yield', '%', SERIES_CONFIG['DGS10']['color'], histories['DGS10'], indicators[0]['bands']),
-            build_history_series('us_2s10s_spread', 'US 2Y/10Y spread', 'pp', '#f59e0b', build_curve_history(histories['DGS10'], histories['DGS2']), indicators[1]['bands']),
-            build_history_series('us_10y_3m_spread', 'US 10Y/3M spread', 'pp', SERIES_CONFIG['T10Y3M']['color'], histories['T10Y3M'], indicators[2]['bands']),
-            build_history_series('us_10y_breakeven', 'US 10Y breakeven inflation', '%', SERIES_CONFIG['T10YIE']['color'], histories['T10YIE'], indicators[3]['bands']),
-            build_history_series('uk_10y_yield', 'UK 10Y government yield', '%', SERIES_CONFIG['IRLTLT01GBM156N']['color'], histories['IRLTLT01GBM156N'], indicators[4]['bands']),
-            build_history_series('japan_10y_yield', 'Japan 10Y government yield', '%', SERIES_CONFIG['IRLTLT01JPM156N']['color'], histories['IRLTLT01JPM156N'], indicators[5]['bands']),
-            build_history_series('canada_10y_yield', 'Canada 10Y government yield', '%', SERIES_CONFIG['IRLTLT01CAM156N']['color'], histories['IRLTLT01CAM156N'], indicators[6]['bands']),
-            build_history_series('australia_10y_yield', 'Australia 10Y government yield', '%', SERIES_CONFIG['IRLTLT01AUM156N']['color'], histories['IRLTLT01AUM156N'], indicators[7]['bands']),
-            build_history_series('euro_area_10y_yield', 'Euro area 10Y government yield', '%', SERIES_CONFIG['IRLTLT01EZM156N']['color'], histories['IRLTLT01EZM156N'], indicators[8]['bands']),
-            build_history_series('germany_10y_yield', 'Germany 10Y government yield', '%', SERIES_CONFIG['IRLTLT01DEM156N']['color'], histories['IRLTLT01DEM156N'], indicators[9]['bands']),
-            build_history_series('cross_market_dispersion', 'Cross-market 10Y dispersion', 'pp', '#e879f9', build_dispersion_history(histories), indicators[10]['bands']),
+            build_history_series('us_30y_yield', 'US 30Y Treasury yield', '%', SERIES_CONFIG['DGS30']['color'], histories['DGS30'], indicators[1]['bands']),
+            build_history_series('us_2s10s_spread', 'US 2Y/10Y spread', 'pp', '#f59e0b', curve_2s10s_history, indicators[2]['bands']),
+            build_history_series('us_10y_3m_spread', 'US 10Y/3M spread', 'pp', SERIES_CONFIG['T10Y3M']['color'], histories['T10Y3M'], indicators[3]['bands']),
+            build_history_series('us_10y_breakeven', 'US 10Y breakeven inflation', '%', SERIES_CONFIG['T10YIE']['color'], histories['T10YIE'], indicators[4]['bands']),
+            build_history_series('uk_10y_yield', 'UK 10Y government yield', '%', SERIES_CONFIG['IRLTLT01GBM156N']['color'], histories['IRLTLT01GBM156N'], indicators[5]['bands']),
+            build_history_series('japan_10y_yield', 'Japan 10Y government yield', '%', SERIES_CONFIG['IRLTLT01JPM156N']['color'], histories['IRLTLT01JPM156N'], indicators[6]['bands']),
+            build_history_series('canada_10y_yield', 'Canada 10Y government yield', '%', SERIES_CONFIG['IRLTLT01CAM156N']['color'], histories['IRLTLT01CAM156N'], indicators[7]['bands']),
+            build_history_series('australia_10y_yield', 'Australia 10Y government yield', '%', SERIES_CONFIG['IRLTLT01AUM156N']['color'], histories['IRLTLT01AUM156N'], indicators[8]['bands']),
+            build_history_series('euro_area_10y_yield', 'Euro area 10Y government yield', '%', SERIES_CONFIG['IRLTLT01EZM156N']['color'], histories['IRLTLT01EZM156N'], indicators[9]['bands']),
+            build_history_series('germany_10y_yield', 'Germany 10Y government yield', '%', SERIES_CONFIG['IRLTLT01DEM156N']['color'], histories['IRLTLT01DEM156N'], indicators[10]['bands']),
+            build_history_series('cross_market_dispersion', 'Cross-market 10Y dispersion', 'pp', '#e879f9', dispersion_history, indicators[11]['bands']),
         ],
     }
 
@@ -574,6 +606,7 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         'notes': [
             'This dashboard is deliberately public-data-only and generic. No personal accounts, balances, credentials, or broker exports are read.',
             'International 10Y series are monthly OECD/FRED feeds, so cross-country comparisons update more slowly than the U.S. daily series.',
+            'US 30Y was added alongside the 10Y because the extra duration can surface fiscal and term-premium stress earlier than a 10Y-only lens.',
             'Euro area and Germany were added as generic European rate anchors so the dashboard is not overfit to Anglo/Japan/commodity-country moves alone.',
             'The value of the dashboard is in the explicit thresholds and action text, not in pretending bond-market interpretation is certain.',
         ],
@@ -639,6 +672,7 @@ def build_live_payload(generated_at: str | None = None) -> dict[str, Any]:
         histories[series_id] = fetch_fred_series(series_id, LOOKBACK_DAYS)
 
     histories['DGS10'] = with_status(histories['DGS10'], lambda value: classify_banded(value, watch_high=4.25, alarm_high=4.75))
+    histories['DGS30'] = with_status(histories['DGS30'], lambda value: classify_banded(value, watch_high=4.75, alarm_high=5.10))
     histories['T10Y3M'] = with_status(histories['T10Y3M'], lambda value: classify_banded(value, watch_low=0.0, alarm_low=-0.25, watch_high=1.00, alarm_high=1.25))
     histories['T10YIE'] = with_status(histories['T10YIE'], lambda value: classify_banded(value, watch_high=2.60, alarm_high=3.00))
     histories['IRLTLT01GBM156N'] = with_status(histories['IRLTLT01GBM156N'], lambda value: classify_banded(value, watch_high=4.75, alarm_high=5.25))
@@ -655,7 +689,7 @@ def build_live_payload(generated_at: str | None = None) -> dict[str, Any]:
 
 def start_cutoff(series_id: str) -> str:
     now = datetime.now(timezone.utc)
-    if series_id in {'DGS10', 'DGS2', 'T10Y3M', 'T10YIE'}:
+    if series_id in {'DGS10', 'DGS2', 'DGS30', 'T10Y3M', 'T10YIE'}:
         return (now - timedelta(days=LOOKBACK_DAYS)).date().isoformat()
     return (now - timedelta(days=900)).date().isoformat()
 

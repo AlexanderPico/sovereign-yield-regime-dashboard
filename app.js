@@ -24,6 +24,13 @@
 
   const statusClass = (status) => `status-${status || 'missing'}`;
   const statusLabel = (status) => ({ ok: 'OK', watch: 'WATCH', alarm: 'ALARM', stale: 'STALE', missing: 'MISSING' }[status] || String(status || 'UNKNOWN').toUpperCase());
+  const historyStrokeForStatus = (status, fallbackColor) => ({
+    ok: '#22c55e',
+    watch: '#f59e0b',
+    alarm: '#ef4444',
+    stale: '#94a3b8',
+    missing: '#94a3b8',
+  }[status] || fallbackColor || '#60a5fa');
 
   function renderHero() {
     nodes.generatedAt.textContent = `generated ${data.generated_at || 'n/a'}`;
@@ -159,6 +166,7 @@
       maxValue += padding;
       const yForValue = (value) => yBottom - ((Number(value) - minValue) / (maxValue - minValue)) * panelHeight;
       const latest = points[points.length - 1];
+      const lineColor = historyStrokeForStatus(latest?.status || item.latest_status, item.color);
       return `<g>
         ${renderHistoryBands(item.bands, yTop, yBottom, margin.left, xMax, yForValue)}
         <line x1="${margin.left}" x2="${xMax}" y1="${yBottom.toFixed(1)}" y2="${yBottom.toFixed(1)}" class="history-axis" />
@@ -166,7 +174,7 @@
         <text x="18" y="${(yTop + 18).toFixed(1)}" class="history-title">${escapeHtml(item.label)}</text>
         <text x="18" y="${(yTop + 40).toFixed(1)}" class="history-latest ${statusClass(latest?.status)}">${escapeHtml(latest ? latest.value.toFixed(item.unit === 'pp' ? 2 : 2) : 'n/a')}${item.unit === 'pp' ? ' pp' : item.unit}</text>
         <text x="18" y="${(yBottom - 8).toFixed(1)}" class="history-range">${escapeHtml(points[0]?.date || '')} → ${escapeHtml(latest?.date || '')}</text>
-        <path d="${pathForPoints(points, xForDate, yForValue)}" fill="none" stroke="${escapeHtml(item.color || '#60a5fa')}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${pathForPoints(points, xForDate, yForValue)}" fill="none" stroke="${escapeHtml(lineColor)}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
         ${latest ? `<circle cx="${xForDate(latest.date).toFixed(1)}" cy="${yForValue(latest.value).toFixed(1)}" r="4" class="history-dot ${statusClass(latest.status)}" />` : ''}
       </g>`;
     }).join('');
