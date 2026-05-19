@@ -132,11 +132,16 @@ h2 { font-size: 1.3rem; margin-bottom: 0; }
 .meter-needle { stroke-width: 5; stroke-linecap: round; }
 .meter-hub { fill: #dce8fb; }
 .meter-score-marker { stroke: rgba(7, 17, 31, 0.8); stroke-width: 4; }
+.meter-score-chip {
+  fill: rgba(7, 17, 31, 0.94);
+  stroke: rgba(148, 163, 184, 0.24);
+  stroke-width: 1.5;
+}
 .meter-caption, .meter-score, .meter-band, .meter-ticks text {
   font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 }
 .meter-caption { fill: #9fb2cf; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
-.meter-score { font-size: 34px; font-weight: 700; }
+.meter-score { fill: #f8fafc; font-size: 34px; font-weight: 700; }
 .meter-band { fill: #dce8fb; font-size: 12px; }
 .meter-ticks text { fill: #93a4bf; font-size: 11px; }
 .meter-tick-line { stroke: rgba(148, 163, 184, 0.45); stroke-width: 2; }

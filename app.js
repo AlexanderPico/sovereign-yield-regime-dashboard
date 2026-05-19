@@ -126,6 +126,7 @@
     const score = Math.max(1, Math.min(100, Number(composite.score || 1)));
     const status = composite.status || 'missing';
     const gaugeAngle = valueToAngle(score);
+    const needleStart = polarPoint(160, 160, 24, gaugeAngle);
     const needle = polarPoint(160, 160, 92, gaugeAngle);
     const bandColor = historyStrokeForStatus(status, '#60a5fa');
     const scenarios = composite.scenario_odds || [];
@@ -167,11 +168,10 @@
         ${segmentPaths}
         <g class="meter-ticks">${tickMarks}</g>
         <circle cx="${scoreMarker.x.toFixed(1)}" cy="${scoreMarker.y.toFixed(1)}" r="7" class="meter-score-marker" style="fill:${escapeHtml(bandColor)}" />
-        <line x1="160" y1="160" x2="${needle.x.toFixed(1)}" y2="${needle.y.toFixed(1)}" class="meter-needle" style="stroke:${escapeHtml(bandColor)}" />
+        <line x1="${needleStart.x.toFixed(1)}" y1="${needleStart.y.toFixed(1)}" x2="${needle.x.toFixed(1)}" y2="${needle.y.toFixed(1)}" class="meter-needle" style="stroke:${escapeHtml(bandColor)}" />
         <circle cx="160" cy="160" r="10" class="meter-hub" />
-        <text x="160" y="116" text-anchor="middle" class="meter-caption">stress score</text>
-        <text x="160" y="166" text-anchor="middle" class="meter-score" style="fill:${escapeHtml(bandColor)}">${score}</text>
-        <text x="160" y="192" text-anchor="middle" class="meter-band">${escapeHtml(composite.band_label || 'n/a')}</text>
+        <rect x="118" y="136" width="84" height="40" rx="20" class="meter-score-chip" style="stroke:${escapeHtml(bandColor)}" />
+        <text x="160" y="163" text-anchor="middle" class="meter-score">${score}</text>
       </svg>`;
 
     nodes.scenarioGrid.innerHTML = scenarios.map((item) => `
