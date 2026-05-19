@@ -8,6 +8,7 @@ It borrows the strongest reusable parts of the Fleet Mission Control finance/Lar
 - indicator cards with prescripted action text
 - small-multiple history charts with native units
 - generated JavaScript data bundle instead of fetched JSON
+- a composite sovereign-stress meter that rolls the indicators into one regime read plus scenario odds and portfolio-bias text
 
 The twist here is narrower and more generic: sovereign yields, curve shape, breakevens, and cross-country divergence only.
 

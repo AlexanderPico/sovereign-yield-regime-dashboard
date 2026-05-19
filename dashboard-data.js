@@ -1,5 +1,5 @@
 globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
-  "generated_at": "2026-05-19T18:07:50Z",
+  "generated_at": "2026-05-19T18:36:13Z",
   "title": "Sovereign Yield Regime Dashboard",
   "summary": {
     "overall_status": "alarm",
@@ -34,6 +34,52 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
       "status": "watch"
     }
   ],
+  "composite_regime": {
+    "score": 57,
+    "label": "Sovereign Stress Meter",
+    "band_label": "Non-benign regime",
+    "status": "watch",
+    "subscores": {
+      "duration": 85,
+      "inflation": 59,
+      "growth": 18,
+      "divergence": 60
+    },
+    "scenario_odds": [
+      {
+        "key": "recession",
+        "label": "Recession",
+        "value": 10
+      },
+      {
+        "key": "stagflation",
+        "label": "Stagflation",
+        "value": 52
+      },
+      {
+        "key": "big_print",
+        "label": "Big Print / policy rescue",
+        "value": 26
+      },
+      {
+        "key": "benign_disinflation",
+        "label": "Benign disinflation",
+        "value": 12
+      }
+    ],
+    "drivers": [
+      "US 30Y is in alarm, pointing to long-end fiscal-duration stress."
+    ],
+    "interpretation": "The dashboard is warning that sovereign-yield conditions are non-benign, but the signal mix is not yet a full policy-panic setup.",
+    "expectation": "Base case: mixed regime. Growth scare and inflation persistence are both live possibilities, so one-factor narratives deserve less confidence.",
+    "investment_bias": [
+      "Favor balanced posture: some liquidity, some defensives, and only selective duration if inflation pressure is easing.",
+      "Avoid all-in positioning on either hard landing or soft landing without confirmation from both the curve and long-end yields.",
+      "Keep new risk sized modestly until the dashboard either clears or escalates."
+    ],
+    "warning": "This band can flip quickly: if long-end yields accelerate, the read shifts toward stagflation; if inflation pressure cools, the curve can reassert a recession-first signal.",
+    "disclaimer": "Composite dashboard inference, not a forecast guarantee or personalized investment advice."
+  },
   "regime_cards": [
     {
       "label": "Overall sovereign-yield regime",

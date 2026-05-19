@@ -74,6 +74,168 @@ def format_value(value: float | None, unit: str) -> str:
     return f'{value:.2f}'
 
 
+def clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def rounded_int(value: float, low: int = 1, high: int = 100) -> int:
+    return int(round(clamp(value, low, high)))
+
+
+def regime_score(value: float | None, watch: float, alarm: float, low_is_bad: bool = False) -> int:
+    if value is None or not math.isfinite(value):
+        return 50
+    value = float(value)
+    if low_is_bad:
+        if value <= alarm:
+            return 90
+        if value <= watch:
+            span = max(watch - alarm, 1e-9)
+            return rounded_int(60 + ((watch - value) / span) * 30)
+        return rounded_int(18 + max(0.0, (watch - value)) * 12)
+    if value >= alarm:
+        return 90
+    if value >= watch:
+        span = max(alarm - watch, 1e-9)
+        return rounded_int(60 + ((value - watch) / span) * 30)
+    return rounded_int(18 + max(0.0, (value - watch + (watch * 0.35))) / max(watch * 0.35, 1e-9) * 18)
+
+
+def composite_band(score: int) -> tuple[str, str]:
+    if score >= 85:
+        return 'Big Print zone', 'alarm'
+    if score >= 65:
+        return 'Fiscal-duration stress', 'alarm'
+    if score >= 45:
+        return 'Non-benign regime', 'watch'
+    if score >= 25:
+        return 'Friction building', 'watch'
+    return 'Disinflation-friendly', 'ok'
+
+
+def normalize_percentage_map(raw_values: dict[str, float]) -> dict[str, int]:
+    cleaned = {key: max(0.0, float(value)) for key, value in raw_values.items()}
+    total = sum(cleaned.values()) or 1.0
+    scaled = {key: (value / total) * 100 for key, value in cleaned.items()}
+    floors = {key: int(math.floor(value)) for key, value in scaled.items()}
+    remainder = 100 - sum(floors.values())
+    ranked = sorted(scaled, key=lambda key: scaled[key] - floors[key], reverse=True)
+    for key in ranked[:remainder]:
+        floors[key] += 1
+    return floors
+
+
+def build_composite_regime(
+    *,
+    overall_status: str,
+    duration_score: int,
+    inflation_score: int,
+    growth_score: int,
+    divergence_score: int,
+    us10_status: str,
+    us30_status: str,
+    breakeven_status: str,
+    curve_2s10s_status: str,
+    curve_10y3m_status: str,
+    dispersion_status: str,
+) -> dict[str, Any]:
+    score = rounded_int((0.30 * duration_score) + (0.25 * inflation_score) + (0.25 * growth_score) + (0.20 * divergence_score))
+    band_label, band_status = composite_band(score)
+
+    raw_odds = {
+        'recession': (growth_score * 1.10) + max(0.0, 65 - inflation_score) * 0.35 + max(0.0, 55 - duration_score) * 0.25,
+        'stagflation': (inflation_score * 0.95) + (duration_score * 0.45) + (divergence_score * 0.30),
+        'big_print': max(0.0, duration_score - 40) * 0.55 + max(0.0, inflation_score - 35) * 0.35 + (divergence_score * 0.25) + (10 if score >= 75 else 0) + (8 if us30_status == 'alarm' else 0) + (6 if breakeven_status == 'alarm' else 0),
+        'benign_disinflation': max(8.0, 150 - (score * 1.40) - (inflation_score * 0.45) - (duration_score * 0.20)),
+    }
+    scenario_odds = normalize_percentage_map(raw_odds)
+
+    if score >= 85:
+        interpretation = 'The dashboard is signaling a policy-instability setup: long-end sovereign yields, inflation pressure, and cross-market stress are aligned enough that orderly disinflation is no longer the base assumption.'
+        expectation = 'Base case: volatile stagflation or funding-stress conditions with a rising chance that policymakers lean toward liquidity support, repression, or some other indirect rescue if long-end yields stay disorderly.'
+        investment_bias = [
+            'Favor liquidity, T-bills/cash, short-duration income, inflation-aware assets, and selective hard-asset or anti-fragile equity exposure.',
+            'Avoid leaning on easy-cuts narratives, long nominal duration, or leverage-sensitive cyclicals as if sovereign financing conditions are calm.',
+            'Keep dry powder above normal; if funding new risk, prefer trimming prior high-beta winners before touching safety-income buckets.',
+        ]
+        warning = 'This is not a crash forecast. It is a warning that policy-reaction risk itself is becoming investable.'
+    elif score >= 65:
+        interpretation = 'Sovereign yields are high enough, and broad enough across developed markets, that the dashboard is explicitly rejecting a benign macro read.'
+        expectation = 'Base case: slower growth with sticky inflation pressure. Tail risk is not just recession; it is a stagflationary or fiscal-duration stress regime if the 30Y and breakevens stay elevated.'
+        investment_bias = [
+            'Favor cash/T-bills, short duration, selective real assets, and high-quality cash-generators over duration-dependent narratives.',
+            'Be cautious on long-duration growth bought purely on lower-rate hopes and on long nominal bonds without a compelling entry reason.',
+            'If adding risk, stagger entries and preserve dry powder; if trimming, source capital from prior high-beta winners first.',
+        ]
+        warning = 'If the 30Y and breakevens remain elevated together, read this meter as stagflation/fiscal-stress first, not as a clean recession trade.'
+    elif score >= 45:
+        interpretation = 'The dashboard is warning that sovereign-yield conditions are non-benign, but the signal mix is not yet a full policy-panic setup.'
+        expectation = 'Base case: mixed regime. Growth scare and inflation persistence are both live possibilities, so one-factor narratives deserve less confidence.'
+        investment_bias = [
+            'Favor balanced posture: some liquidity, some defensives, and only selective duration if inflation pressure is easing.',
+            'Avoid all-in positioning on either hard landing or soft landing without confirmation from both the curve and long-end yields.',
+            'Keep new risk sized modestly until the dashboard either clears or escalates.',
+        ]
+        warning = 'This band can flip quickly: if long-end yields accelerate, the read shifts toward stagflation; if inflation pressure cools, the curve can reassert a recession-first signal.'
+    elif score >= 25:
+        interpretation = 'Friction is building, but the dashboard is not yet asserting a full sovereign-stress regime.'
+        expectation = 'Base case: cautious normality. Macro review cadence should increase, but the data do not yet justify treating sovereign-yield stress as the dominant market driver.'
+        investment_bias = [
+            'Favor ordinary allocation discipline with a modest liquidity buffer.',
+            'Avoid overreacting to one isolated indicator when the composite remains below the non-benign band.',
+            'Use this as a watchlist regime rather than a forced-rotation regime.',
+        ]
+        warning = 'A few additional upgrades, especially in the 30Y or breakevens, can move this section into a more actionable warning state.'
+    else:
+        interpretation = 'The dashboard is not seeing strong evidence of sovereign-yield stress. Normal review cadence is still appropriate.'
+        expectation = 'Base case: benign disinflation or at least a contained macro backdrop, subject to routine monitoring.'
+        investment_bias = [
+            'Favor normal allocation discipline and selective duration rather than a special sovereign-stress posture.',
+            'Avoid turning one-off moves into regime calls without composite confirmation.',
+            'No special dry-powder rule is implied by this dashboard state.',
+        ]
+        warning = 'Composite dashboard inference only; not a forecast guarantee.'
+
+    drivers = []
+    if us30_status == 'alarm':
+        drivers.append('US 30Y is in alarm, pointing to long-end fiscal-duration stress.')
+    if breakeven_status == 'alarm':
+        drivers.append('10Y breakevens are in alarm, so nominal-yield pressure looks inflationary rather than purely growth-led.')
+    if curve_2s10s_status == 'alarm' or curve_10y3m_status == 'alarm':
+        drivers.append('Curve structure is still warning that recession or policy-error risk cannot be dismissed.')
+    if dispersion_status in {'watch', 'alarm'}:
+        drivers.append('Cross-market sovereign dispersion is elevated, so country-specific fiscal or policy stress is broadening the signal.')
+    if us10_status == 'watch' and us30_status == 'watch':
+        drivers.append('Both the US 10Y and 30Y are elevated, keeping duration assumptions under pressure even without full alarm.')
+    if not drivers:
+        drivers.append('The composite is being driven mostly by contained indicator readings rather than a concentrated alarm cluster.')
+
+    return {
+        'score': score,
+        'label': 'Sovereign Stress Meter',
+        'band_label': band_label,
+        'status': band_status if overall_status != 'missing' else 'missing',
+        'subscores': {
+            'duration': duration_score,
+            'inflation': inflation_score,
+            'growth': growth_score,
+            'divergence': divergence_score,
+        },
+        'scenario_odds': [
+            {'key': 'recession', 'label': 'Recession', 'value': scenario_odds['recession']},
+            {'key': 'stagflation', 'label': 'Stagflation', 'value': scenario_odds['stagflation']},
+            {'key': 'big_print', 'label': 'Big Print / policy rescue', 'value': scenario_odds['big_print']},
+            {'key': 'benign_disinflation', 'label': 'Benign disinflation', 'value': scenario_odds['benign_disinflation']},
+        ],
+        'drivers': drivers,
+        'interpretation': interpretation,
+        'expectation': expectation,
+        'investment_bias': investment_bias,
+        'warning': warning,
+        'disclaimer': 'Composite dashboard inference, not a forecast guarantee or personalized investment advice.',
+    }
+
+
 def make_point(date: str, value: float | None, status: str = 'present', series_id: str | None = None) -> dict[str, Any]:
     return {
         'date': date,
@@ -484,9 +646,42 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
     warning_count = sum(1 for item in indicators if item['status'] in {'watch', 'stale'})
     overall_status = max_status(indicator_statuses)
 
+    duration_score = rounded_int((regime_score(dgs10['value'], 4.25, 4.75) + regime_score(dgs30['value'], 4.75, 5.10)) / 2)
+    inflation_score = rounded_int((
+        regime_score(t10yie['value'], 2.60, 3.00)
+        + regime_score(uk10['value'], 4.75, 5.25)
+        + regime_score(au10['value'], 4.50, 5.00)
+        + regime_score(ez10['value'], 3.25, 3.75)
+        + regime_score(de10['value'], 2.75, 3.25)
+    ) / 5)
+    growth_score = rounded_int((
+        regime_score(curve_2s10s, 0.0, -0.50, low_is_bad=True)
+        + regime_score(t10y3m_value, 0.0, -0.25, low_is_bad=True)
+    ) / 2)
+    divergence_score = rounded_int((
+        regime_score(dispersion_value, 2.50, 3.25)
+        + regime_score(jp10['value'], 1.75, 2.50)
+        + regime_score(uk10['value'], 4.75, 5.25)
+        + regime_score(ez10['value'], 3.25, 3.75)
+        + regime_score(de10['value'], 2.75, 3.25)
+    ) / 5)
+
     inflation_pressure = max_status([us10_status, us30_status, breakeven_status, uk10_status, au10_status, ez10_status, de10_status])
     growth_warning = max_status([curve_2s10s_status, curve_10y3m_status])
     sovereign_stress = max_status([dispersion_status, uk10_status, jp10_status, ez10_status, de10_status])
+    composite_regime = build_composite_regime(
+        overall_status=overall_status,
+        duration_score=duration_score,
+        inflation_score=inflation_score,
+        growth_score=growth_score,
+        divergence_score=divergence_score,
+        us10_status=us10_status,
+        us30_status=us30_status,
+        breakeven_status=breakeven_status,
+        curve_2s10s_status=curve_2s10s_status,
+        curve_10y3m_status=curve_10y3m_status,
+        dispersion_status=dispersion_status,
+    )
 
     regime_cards = [
         {
@@ -588,6 +783,7 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
             'latest_observation': latest_observation,
         },
         'hero_cards': hero_cards,
+        'composite_regime': composite_regime,
         'regime_cards': regime_cards,
         'indicators': indicators,
         'history': history,

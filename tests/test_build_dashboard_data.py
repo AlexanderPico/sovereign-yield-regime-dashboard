@@ -104,6 +104,12 @@ def test_build_dashboard_payload_flags_alarm_regime_and_summary_counts():
     assert payload['hero_cards'][2]['label'] == 'US 30Y'
     assert 'inflation' in payload['regime_cards'][0]['drivers'].lower()
 
+    composite = payload['composite_regime']
+    assert 1 <= composite['score'] <= 100
+    assert composite['band_label'] in {'Big Print zone', 'Fiscal-duration stress', 'Non-benign regime', 'Friction building', 'Disinflation-friendly'}
+    assert sum(item['value'] for item in composite['scenario_odds']) == 100
+    assert len(composite['investment_bias']) == 3
+
     keys = {item['key'] for item in payload['indicators']}
     assert 'us_10y_yield' in keys
     assert 'us_30y_yield' in keys
@@ -128,6 +134,7 @@ def test_render_dashboard_bundle_emits_assignable_global_js():
     bundle = module.render_dashboard_bundle(payload)
 
     assert bundle.startswith('globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = ')
+    assert 'composite_regime' in bundle
     assert 'us_30y_yield' in bundle
     assert 'cross_market_dispersion' in bundle
     assert '2026-05-15T12:00:00Z' in bundle

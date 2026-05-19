@@ -5,6 +5,15 @@
   const nodes = {
     generatedAt: el('generatedAt'),
     heroGrid: el('heroGrid'),
+    compositeBand: el('compositeBand'),
+    compositeMeter: el('compositeMeter'),
+    scenarioGrid: el('scenarioGrid'),
+    compositeDrivers: el('compositeDrivers'),
+    compositeInterpretation: el('compositeInterpretation'),
+    compositeExpectation: el('compositeExpectation'),
+    compositeBias: el('compositeBias'),
+    compositeWarning: el('compositeWarning'),
+    compositeDisclaimer: el('compositeDisclaimer'),
     sourcePills: el('sourcePills'),
     regimeGrid: el('regimeGrid'),
     latestObservation: el('latestObservation'),
@@ -90,6 +99,67 @@
         </article>
       `;
     }).join('');
+  }
+
+  function polarPoint(cx, cy, radius, degrees) {
+    const radians = (degrees - 90) * (Math.PI / 180);
+    return {
+      x: cx + (Math.cos(radians) * radius),
+      y: cy + (Math.sin(radians) * radius),
+    };
+  }
+
+  function describeArc(cx, cy, radius, startAngle, endAngle) {
+    const start = polarPoint(cx, cy, radius, endAngle);
+    const end = polarPoint(cx, cy, radius, startAngle);
+    const largeArcFlag = Math.abs(endAngle - startAngle) <= 180 ? '0' : '1';
+    return `M ${start.x.toFixed(1)} ${start.y.toFixed(1)} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x.toFixed(1)} ${end.y.toFixed(1)}`;
+  }
+
+  function renderComposite() {
+    const composite = data.composite_regime || {};
+    const score = Math.max(1, Math.min(100, Number(composite.score || 1)));
+    const status = composite.status || 'missing';
+    const gaugeAngle = -120 + ((score - 1) / 99) * 240;
+    const needle = polarPoint(160, 160, 100, gaugeAngle);
+    const bandColor = historyStrokeForStatus(status, '#60a5fa');
+    const scenarios = composite.scenario_odds || [];
+    const biasItems = composite.investment_bias || [];
+
+    nodes.compositeBand.textContent = `${composite.band_label || 'n/a'} · ${score}/100`;
+    nodes.compositeBand.className = `badge mono ${statusClass(status)}`;
+    nodes.compositeMeter.innerHTML = `
+      <svg viewBox="0 0 320 220" class="composite-meter-svg" aria-hidden="true">
+        <path d="${describeArc(160, 160, 112, -120, -24)}" class="meter-arc meter-arc-ok" />
+        <path d="${describeArc(160, 160, 112, -24, 24)}" class="meter-arc meter-arc-watch" />
+        <path d="${describeArc(160, 160, 112, 24, 120)}" class="meter-arc meter-arc-alarm" />
+        <path d="${describeArc(160, 160, 84, -120, 120)}" class="meter-arc meter-track" />
+        <g class="meter-ticks">
+          <text x="44" y="173">1</text>
+          <text x="86" y="58">25</text>
+          <text x="154" y="32">50</text>
+          <text x="226" y="58">75</text>
+          <text x="264" y="173">100</text>
+        </g>
+        <line x1="160" y1="160" x2="${needle.x.toFixed(1)}" y2="${needle.y.toFixed(1)}" class="meter-needle" style="stroke:${escapeHtml(bandColor)}" />
+        <circle cx="160" cy="160" r="10" class="meter-hub" />
+        <text x="160" y="130" text-anchor="middle" class="meter-title">${escapeHtml(composite.label || 'Sovereign Stress Meter')}</text>
+        <text x="160" y="172" text-anchor="middle" class="meter-score" style="fill:${escapeHtml(bandColor)}">${score}</text>
+        <text x="160" y="194" text-anchor="middle" class="meter-band">${escapeHtml(composite.band_label || 'n/a')}</text>
+      </svg>`;
+
+    nodes.scenarioGrid.innerHTML = scenarios.map((item) => `
+      <article class="scenario-card">
+        <div class="label">${escapeHtml(item.label)}</div>
+        <div class="scenario-value">${escapeHtml(item.value)}%</div>
+      </article>
+    `).join('');
+    nodes.compositeDrivers.innerHTML = (composite.drivers || []).map((item) => `<div class="stack-item compact">${escapeHtml(item)}</div>`).join('');
+    nodes.compositeInterpretation.textContent = composite.interpretation || 'n/a';
+    nodes.compositeExpectation.textContent = composite.expectation || 'n/a';
+    nodes.compositeBias.innerHTML = `<ul class="bias-list">${biasItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+    nodes.compositeWarning.textContent = composite.warning || '';
+    nodes.compositeDisclaimer.textContent = composite.disclaimer || 'Composite dashboard inference only.';
   }
 
   function pathForPoints(points, xForDate, yForValue) {
@@ -192,6 +262,7 @@
   }
 
   renderHero();
+  renderComposite();
   renderSources();
   renderRegimes();
   renderIndicators();
