@@ -14,6 +14,7 @@
         <h1>Sovereign Yield Regime Dashboard</h1>
         <p class="hero-copy">Tracking sovereign yields, curve warnings, inflation pressure, and cross-country divergence.</p>
         <p class="hero-meta mono" id="generatedAt">generated n/a</p>
+        <p class="hero-warning" id="freshnessWarning" hidden>Dashboard data is older than 3 days. Treat the regime read as potentially stale until the next refresh.</p>
       </div>
       <div class="hero-grid" id="heroGrid"></div>
     </section>
@@ -27,7 +28,10 @@
         <div class="badge mono" id="compositeBand">n/a</div>
       </div>
       <div class="composite-grid">
-        <div id="compositeMeter" class="composite-meter" role="img" aria-label="Composite sovereign stress meter"></div>
+        <div class="composite-meter-stack">
+          <div id="compositeMeter" class="composite-meter" role="img" aria-label="Composite sovereign stress meter"></div>
+          <div id="compositeSubscores" class="subscore-grid" aria-label="Composite subscores and weights"></div>
+        </div>
         <div class="composite-copy">
           <div id="scenarioGrid" class="scenario-grid"></div>
           <div id="compositeDrivers" class="stack-list compact"></div>

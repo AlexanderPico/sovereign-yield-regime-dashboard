@@ -24,12 +24,11 @@ Current indicators:
 - Japan 10Y government yield
 - Canada 10Y government yield
 - Australia 10Y government yield
-- euro area 10Y government yield
 - Germany 10Y government yield
 - cross-market 10Y dispersion across the tracked sovereign set
 
 Each indicator maps to:
-- a status: `ok`, `watch`, or `alarm`
+- a status: `ok`, `watch`, `stale`, or `alarm`
 - threshold text
 - a short why-it-matters explanation
 - a prescripted alarm-action review note
@@ -83,9 +82,15 @@ Then visit `http://127.0.0.1:8000/`.
 
 The included workflow rebuilds the data and deploys the repo to GitHub Pages on:
 - manual dispatch
-- weekdays at `23:20 UTC`
+- weekdays at `23:20 UTC` (`cron: '20 23 * * 1-5'`)
 
-That time is chosen to sit after the U.S. cash close and after typical same-day FRED daily-series updates, while still keeping the site fresh on a normal operator cadence.
+That weekday cadence is intentional for timeliness: it sits after the U.S. cash close and after typical same-day FRED daily-series updates. Sunday-only was too slow for the dashboard's warning use case.
+
+Germany (`IRLTLT01DEM156N`) is the live euro-area duration anchor. The euro-area OECD aggregate (`IRLTLT01EZM156N`) was dropped after it stalled at 2026-01-01 on FRED.
+
+Indicator statuses include `stale` when daily prints are older than 3 business days or monthly prints older than 45 calendar days. Cross-market dispersion is aligned on the last common month across constituents.
+
+The composite Sovereign Stress Meter follows Option A: inflation = `T10YIE` (room left for a future 5Y5Y companion), growth = max(inversion, bear-steepener) using the same card thresholds, divergence = common-month dispersion + Japan/Canada/Australia, and missing inputs are excluded with weights renormalized rather than hardcoding 50.
 
 To enable Pages in GitHub:
 1. push the repo
@@ -105,7 +110,6 @@ All current data comes from public FRED CSV endpoints:
 - `IRLTLT01JPM156N`
 - `IRLTLT01CAM156N`
 - `IRLTLT01AUM156N`
-- `IRLTLT01EZM156N`
 - `IRLTLT01DEM156N`
 
 ## Automation

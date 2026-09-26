@@ -4,9 +4,11 @@
   const el = (id) => document.getElementById(id);
   const nodes = {
     generatedAt: el('generatedAt'),
+    freshnessWarning: el('freshnessWarning'),
     heroGrid: el('heroGrid'),
     compositeBand: el('compositeBand'),
     compositeMeter: el('compositeMeter'),
+    compositeSubscores: el('compositeSubscores'),
     scenarioGrid: el('scenarioGrid'),
     compositeDrivers: el('compositeDrivers'),
     compositeInterpretation: el('compositeInterpretation'),
@@ -41,8 +43,44 @@
     missing: '#94a3b8',
   }[status] || fallbackColor || '#60a5fa');
 
+  function formatGeneratedAt(iso) {
+    if (!iso) {
+      return { text: 'generated n/a', ageDays: null };
+    }
+    const dt = new Date(iso);
+    if (Number.isNaN(dt.getTime())) {
+      return { text: `generated ${iso}`, ageDays: null };
+    }
+    const pt = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }).format(dt);
+    const ageMs = Date.now() - dt.getTime();
+    const ageDays = ageMs / 86400000;
+    let relative;
+    if (ageMs < 0) {
+      relative = 'just now';
+    } else if (ageDays < 1) {
+      const hours = Math.max(1, Math.round(ageMs / 3600000));
+      relative = `${hours}h ago`;
+    } else {
+      relative = `${Math.round(ageDays)}d ago`;
+    }
+    return { text: `generated ${pt} (${relative})`, ageDays };
+  }
+
   function renderHero() {
-    nodes.generatedAt.textContent = `generated ${data.generated_at || 'n/a'}`;
+    const generated = formatGeneratedAt(data.generated_at);
+    nodes.generatedAt.textContent = generated.text;
+    if (nodes.freshnessWarning) {
+      const stale = generated.ageDays !== null && generated.ageDays > 3;
+      nodes.freshnessWarning.hidden = !stale;
+    }
     nodes.heroGrid.innerHTML = (data.hero_cards || []).map((card) => `
       <article class="hero-card ${statusClass(card.status)}">
         <div class="label">${escapeHtml(card.label)}</div>
@@ -185,6 +223,36 @@
     nodes.compositeExpectation.textContent = composite.expectation || 'n/a';
     nodes.compositeBias.innerHTML = `<ul class="bias-list">${biasItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
     nodes.compositeWarning.textContent = composite.warning || '';
+    const subscores = composite.subscores || {};
+    const weights = composite.weights || {};
+    const effectiveWeights = composite.effective_weights || {};
+    const subscoreLabels = {
+      duration: 'Duration',
+      inflation: 'Inflation',
+      growth: 'Growth',
+      divergence: 'Divergence',
+    };
+    if (nodes.compositeSubscores) {
+      nodes.compositeSubscores.innerHTML = Object.keys(subscoreLabels).map((key) => {
+        const raw = subscores[key];
+        const valueLabel = raw === null || raw === undefined ? 'n/a' : String(raw);
+        const nominal = weights[key];
+        const effective = effectiveWeights[key];
+        const weightBits = [];
+        if (nominal !== undefined && nominal !== null) {
+          weightBits.push(`w ${Math.round(Number(nominal) * 100)}%`);
+        }
+        if (effective !== undefined && effective !== null) {
+          weightBits.push(`eff ${Math.round(Number(effective) * 100)}%`);
+        }
+        return `<article class="subscore-card">
+          <div class="label">${escapeHtml(subscoreLabels[key])}</div>
+          <div class="value">${escapeHtml(valueLabel)}</div>
+          <div class="note">${escapeHtml(weightBits.join(' · ') || 'weight n/a')}</div>
+        </article>`;
+      }).join('');
+    }
+
     nodes.compositeDisclaimer.textContent = composite.disclaimer || 'Composite dashboard inference only.';
   }
 

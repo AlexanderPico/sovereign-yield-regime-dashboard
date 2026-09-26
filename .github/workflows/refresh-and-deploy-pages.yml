@@ -3,7 +3,7 @@ name: refresh-and-deploy-pages
 on:
   workflow_dispatch:
   schedule:
-    - cron: '20 23 * * 0'
+    - cron: '20 23 * * 1-5'
 
 permissions:
   contents: read
