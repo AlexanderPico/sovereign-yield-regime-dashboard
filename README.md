@@ -27,6 +27,13 @@ Current indicators:
 - Germany 10Y government yield
 - cross-market 10Y dispersion across the tracked sovereign set
 
+Plus a separate weekly **Gold Reset Watch** lens:
+- gold certificate account deviation (the Treasury–Fed revaluation mechanism gate)
+- gold price proxy, 3-month change (context only)
+- broad dollar index, 3-month change (Hypothesis 1 leg)
+- gold ETF volatility index (orderly reform vs disorderly crisis)
+- Bitcoin, 3-month change (Hypothesis 2 adoption vs impairment leg)
+
 Each indicator maps to:
 - a status: `ok`, `watch`, `stale`, or `alarm`
 - threshold text
@@ -111,11 +118,52 @@ All current data comes from public FRED CSV endpoints:
 - `IRLTLT01CAM156N`
 - `IRLTLT01AUM156N`
 - `IRLTLT01DEM156N`
+- `WGCAL`
+- `IQ12260`
+- `DTWEXBGS`
+- `GVZCLS`
+- `CBBTCUSD`
 
 ## Automation
 
 - `.github/workflows/ci.yml` runs the secret-free regression path on `push` and `pull_request`.
 - `.github/workflows/refresh-and-deploy-pages.yml` remains the scheduled/manual Pages refresh path.
+
+## Gold Reset Watch (weekly)
+
+A separate panel that tests the gold-revaluation thesis instead of assuming it. It is deliberately
+**excluded from the composite Sovereign Stress Meter** so an uncalibrated tail-risk lens cannot
+distort the sovereign-yield score.
+
+The design is mechanism-first:
+
+1. **Mechanism gate.** The Treasury–Fed gold certificate account (`WGCAL`) is carried at the
+   statutory $42.2222/oz book value, so it is nearly constant near $11.0bn. A step change beyond
+   ±1.00% of its trailing median is the most direct public evidence that revaluation has actually
+   been used. While this card is green, rising gold prices and reset commentary are **not**
+   evidence of an impending reset.
+2. **The central question.** Would revaluation create a one-time source of Treasury financing, or
+   a durable change in the dollar's monetary backing? The panel answers this conservatively:
+   unanswered until the mechanism moves, then "one-time financing" if the dollar holds firm and
+   "durable change" only if the dollar depreciates alongside it.
+3. **Two testable hypotheses**, each with an explicit counter-case:
+   - *H1: revaluation drives monetary expansion and dollar depreciation.* Needs mechanism plus
+     sustained broad-dollar weakness. A credible reform that restores dollar confidence would
+     instead reduce monetary-hedge demand, so dollar strength is a real falsifier.
+   - *H2: the crisis itself accelerates Bitcoin adoption.* Depends on crisis type. Elevated gold
+     volatility with a deep Bitcoin drawdown is the impairment branch (forced liquidation,
+     exchange failures, restricted access), not the adoption branch.
+4. **Manual checks.** Legislative proposals and Treasury/Fed statements cannot be pulled from
+   FRED, so the panel links them as explicit weekly checks rather than simulating them as data:
+   Congress.gov legislation search, Treasury press releases, the Fed H.4.1 gold certificate line,
+   and the FOMC calendar.
+
+Every watch card states both what would confirm it and what would falsify it. Alerts fire only
+when the mechanism moves, when a hypothesis leg crosses its threshold, or when an input goes
+stale — price moves alone do not qualify. Weekly prints go stale after 14 calendar days.
+
+Guardrail carried on the panel: international evidence suggests revaluation can provide financing
+but cannot by itself solve persistent deficits.
 
 ## Guardrails
 
@@ -129,4 +177,5 @@ All current data comes from public FRED CSV endpoints:
 - add a small sovereign-stress basket for selected EM issuers
 - add a markdown export of the current regime snapshot for agent summarization
 - add a second layer of cross-country spread indicators rather than only max-min dispersion
+- add an automated legislative-text scan for the Gold Reset Watch manual checks if a stable public API is available
 - consider a 5Y5Y inflation-expectations or term-premium proxy if a public, stable source improves signal quality without overcomplicating the surface

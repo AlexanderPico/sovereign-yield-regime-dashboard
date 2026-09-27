@@ -91,6 +91,241 @@ def sample_history():
     }
 
 
+def gold_watch_observations(**overrides):
+    base = {
+        'WGCAL': {'series_id': 'WGCAL', 'label': 'Gold certificate account', 'date': '2026-05-13', 'value': 11037.0, 'status': 'present'},
+        'IQ12260': {'series_id': 'IQ12260', 'label': 'Gold export price index', 'date': '2026-04-01', 'value': 155.1, 'status': 'present'},
+        'DTWEXBGS': {'series_id': 'DTWEXBGS', 'label': 'Broad dollar index', 'date': '2026-05-14', 'value': 119.5, 'status': 'present'},
+        'GVZCLS': {'series_id': 'GVZCLS', 'label': 'Gold volatility', 'date': '2026-05-14', 'value': 23.6, 'status': 'present'},
+        'CBBTCUSD': {'series_id': 'CBBTCUSD', 'label': 'Bitcoin', 'date': '2026-05-14', 'value': 84000.0, 'status': 'present'},
+    }
+    base.update(overrides)
+    return base
+
+
+def gold_watch_history(**overrides):
+    base = {
+        'WGCAL': [
+            {'date': '2026-04-15', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-22', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-29', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-06', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-13', 'value': 11037.0, 'status': 'present'},
+        ],
+        'IQ12260': [
+            {'date': '2026-01-01', 'value': 150.0, 'status': 'present'},
+            {'date': '2026-02-01', 'value': 152.0, 'status': 'present'},
+            {'date': '2026-04-01', 'value': 155.1, 'status': 'present'},
+        ],
+        'DTWEXBGS': [
+            {'date': '2026-02-12', 'value': 120.0, 'status': 'present'},
+            {'date': '2026-04-14', 'value': 119.8, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 119.5, 'status': 'present'},
+        ],
+        'GVZCLS': [
+            {'date': '2026-02-12', 'value': 21.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 23.6, 'status': 'present'},
+        ],
+        'CBBTCUSD': [
+            {'date': '2026-02-12', 'value': 86000.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 84000.0, 'status': 'present'},
+        ],
+    }
+    base.update(overrides)
+    return base
+
+
+def build_gold_watch(observations=None, histories=None, generated_at='2026-05-15T12:00:00Z'):
+    observations = {**sample_observations(), **(observations or gold_watch_observations())}
+    histories = {**sample_history(), **(histories or gold_watch_history())}
+    payload = module.build_dashboard_payload(
+        observations=observations,
+        histories=histories,
+        generated_at=generated_at,
+    )
+    return payload, payload['gold_reset_watch']
+
+
+def test_gold_reset_watch_tracks_mechanism_hypotheses_and_manual_checks():
+    payload, watch = build_gold_watch()
+
+    # The watch is a first-class payload section with a weekly cadence.
+    assert 'weekly' in watch['cadence'].lower()
+    assert watch['excluded_from_composite'] is True
+
+    signals = {item['key']: item for item in watch['signals']}
+    assert set(signals) == {
+        'gold_certificate_deviation',
+        'gold_price_proxy_change',
+        'dollar_index_change',
+        'gold_volatility',
+        'bitcoin_3m_change',
+    }
+
+    # Both testable hypotheses from the analysis are explicit, not implied.
+    hypothesis_keys = {item['key'] for item in watch['hypotheses']}
+    assert hypothesis_keys == {'h1_monetary_expansion', 'h2_crisis_adoption'}
+    for hypothesis in watch['hypotheses']:
+        assert hypothesis['test']
+        assert hypothesis['counter_case']
+        assert hypothesis['signals']
+
+    # Every signal must say what would confirm AND what would falsify it.
+    for signal in watch['signals']:
+        assert signal['confirms']
+        assert signal['falsifies']
+        assert signal['thresholds']
+
+    # The central question is stated and answered conservatively by default.
+    assert 'one-time' in watch['central_question'].lower()
+    assert 'monetary backing' in watch['central_question'].lower()
+
+    # Legislation / Treasury / Fed checks are surfaced as real manual checks.
+    check_urls = ' '.join(item['url'] for item in watch['manual_checks'])
+    assert 'congress.gov' in check_urls
+    assert 'treasury.gov' in check_urls
+    assert 'h41' in check_urls
+    assert 'fomccalendars' in check_urls
+
+    # Gold-watch series must not leak into the sovereign composite.
+    assert set(module.GOLD_WATCH_SERIES).isdisjoint(module.DISPERSION_MEMBERS)
+    indicator_keys = {item['key'] for item in payload['indicators']}
+    assert indicator_keys.isdisjoint(set(signals))
+
+
+def test_flat_gold_certificate_account_refuses_to_call_a_reset():
+    _, watch = build_gold_watch()
+    cert = next(item for item in watch['signals'] if item['key'] == 'gold_certificate_deviation')
+    assert cert['status'] == 'ok'
+    assert watch['mechanism_status'] == 'ok'
+    assert 'not evidence' in watch['mechanism_state'].lower()
+    assert 'unanswered' in watch['central_answer'].lower()
+    assert watch['alerts'] == []
+
+
+def test_rising_gold_alone_is_context_not_reset_evidence():
+    histories = gold_watch_history(**{
+        'IQ12260': [
+            {'date': '2026-01-01', 'value': 120.0, 'status': 'present'},
+            {'date': '2026-02-01', 'value': 130.0, 'status': 'present'},
+            {'date': '2026-04-01', 'value': 155.1, 'status': 'present'},
+        ],
+    })
+    _, watch = build_gold_watch(histories=histories)
+    proxy = next(item for item in watch['signals'] if item['key'] == 'gold_price_proxy_change')
+    assert proxy['status'] == 'alarm'
+    assert proxy['hypothesis'] == 'Context'
+    # Mechanism is untouched, so the central question stays unanswered.
+    assert watch['mechanism_status'] == 'ok'
+    assert 'unanswered' in watch['central_answer'].lower()
+    assert any('context only' in alert for alert in watch['alerts'])
+
+
+def test_certificate_step_change_with_weak_dollar_reads_as_regime_change():
+    histories = gold_watch_history(**{
+        'WGCAL': [
+            {'date': '2026-04-15', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-22', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-29', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-06', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-13', 'value': 750000.0, 'status': 'present'},
+        ],
+        'DTWEXBGS': [
+            {'date': '2026-02-12', 'value': 120.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 108.0, 'status': 'present'},
+        ],
+    })
+    _, watch = build_gold_watch(histories=histories)
+    cert = next(item for item in watch['signals'] if item['key'] == 'gold_certificate_deviation')
+    dollar = next(item for item in watch['signals'] if item['key'] == 'dollar_index_change')
+    assert cert['status'] == 'alarm'
+    assert dollar['status'] == 'alarm'
+    assert watch['central_status'] == 'alarm'
+    assert 'durable change' in watch['central_answer'].lower()
+    assert any('H.4.1' in alert for alert in watch['alerts'])
+
+
+def test_certificate_step_change_with_firm_dollar_reads_as_one_time_financing():
+    histories = gold_watch_history(**{
+        'WGCAL': [
+            {'date': '2026-04-15', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-22', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-29', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-06', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-13', 'value': 750000.0, 'status': 'present'},
+        ],
+        'DTWEXBGS': [
+            {'date': '2026-02-12', 'value': 118.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 121.0, 'status': 'present'},
+        ],
+    })
+    _, watch = build_gold_watch(histories=histories)
+    assert watch['central_status'] == 'watch'
+    assert 'one-time financing' in watch['central_answer'].lower()
+
+
+def test_bitcoin_impairment_branch_is_distinguished_from_adoption():
+    histories = gold_watch_history(**{
+        'GVZCLS': [
+            {'date': '2026-02-12', 'value': 22.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 45.0, 'status': 'present'},
+        ],
+        'CBBTCUSD': [
+            {'date': '2026-02-12', 'value': 100000.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 55000.0, 'status': 'present'},
+        ],
+    })
+    observations = gold_watch_observations(**{
+        'GVZCLS': {'series_id': 'GVZCLS', 'label': 'Gold volatility', 'date': '2026-05-14', 'value': 45.0, 'status': 'present'},
+        'CBBTCUSD': {'series_id': 'CBBTCUSD', 'label': 'Bitcoin', 'date': '2026-05-14', 'value': 55000.0, 'status': 'present'},
+    })
+    _, watch = build_gold_watch(observations=observations, histories=histories)
+    h2 = next(item for item in watch['hypotheses'] if item['key'] == 'h2_crisis_adoption')
+    assert h2['status'] == 'alarm'
+    assert any('impairment branch' in alert for alert in watch['alerts'])
+
+
+def test_stale_weekly_gold_certificate_print_is_flagged():
+    as_of = datetime(2026, 5, 15, 12, 0, tzinfo=timezone.utc)
+    assert module.freshness_status('2026-05-13', 'weekly', as_of) == 'fresh'
+    assert module.freshness_status('2026-04-20', 'weekly', as_of) == 'stale'
+
+    # Lag-tolerant kinds exist so normally-published laggy series are not pinned to stale.
+    assert module.freshness_status('2026-05-07', 'lagged_daily', as_of) == 'fresh'
+    assert module.freshness_status('2026-04-20', 'lagged_daily', as_of) == 'stale'
+    assert module.freshness_status('2026-03-01', 'lagged_monthly', as_of) == 'fresh'
+    assert module.freshness_status('2026-01-01', 'lagged_monthly', as_of) == 'stale'
+
+    observations = gold_watch_observations(**{
+        'WGCAL': {'series_id': 'WGCAL', 'label': 'Gold certificate account', 'date': '2026-04-01', 'value': 11037.0, 'status': 'present'},
+    })
+    _, watch = build_gold_watch(observations=observations)
+    cert = next(item for item in watch['signals'] if item['key'] == 'gold_certificate_deviation')
+    assert cert['status'] == 'stale'
+    assert any('stale' in alert for alert in watch['alerts'])
+
+
+def test_gold_watch_series_and_page_wiring_are_present():
+    for series_id in module.GOLD_WATCH_SERIES:
+        assert series_id in module.SERIES_CONFIG
+
+    index_html = (REPO_ROOT / 'index.html').read_text()
+    app_js = (REPO_ROOT / 'app.js').read_text()
+    assert 'goldWatch' in index_html
+    assert 'Gold Reset Watch' in index_html
+    assert 'renderGoldWatch' in app_js
+    assert 'gold_reset_watch' in app_js
+
+    payload, watch = build_gold_watch()
+    bundle = module.render_dashboard_bundle(payload)
+    assert 'gold_reset_watch' in bundle
+    assert 'h1_monetary_expansion' in bundle
+
+    history_keys = {item['key'] for item in payload['history']['series']}
+    assert 'gold_certificate_level' in history_keys
+    assert 'bitcoin_usd' in history_keys
+
+
 def test_build_dashboard_payload_flags_alarm_regime_and_summary_counts():
     payload = module.build_dashboard_payload(
         observations=sample_observations(),

@@ -22,6 +22,18 @@
     indicatorGrid: el('indicatorGrid'),
     historyWindow: el('historyWindow'),
     historyPlot: el('historyPlot'),
+    goldWatchStatus: el('goldWatchStatus'),
+    goldWatchCadence: el('goldWatchCadence'),
+    goldCentralQuestion: el('goldCentralQuestion'),
+    goldCentralAnswer: el('goldCentralAnswer'),
+    goldMechanismCard: el('goldMechanismCard'),
+    goldMechanismState: el('goldMechanismState'),
+    goldAlerts: el('goldAlerts'),
+    goldAlertRule: el('goldAlertRule'),
+    goldHypotheses: el('goldHypotheses'),
+    goldSignals: el('goldSignals'),
+    goldManualChecks: el('goldManualChecks'),
+    goldGuardrail: el('goldGuardrail'),
     thresholdPolicy: el('thresholdPolicy'),
     notesList: el('notesList'),
   };
@@ -256,6 +268,73 @@
     nodes.compositeDisclaimer.textContent = composite.disclaimer || 'Composite dashboard inference only.';
   }
 
+  function renderGoldWatch() {
+    const watch = data.gold_reset_watch;
+    if (!watch || !nodes.goldWatchStatus) return;
+
+    nodes.goldWatchStatus.textContent = statusLabel(watch.status);
+    nodes.goldWatchStatus.className = `badge mono ${statusClass(watch.status)}`;
+    nodes.goldWatchCadence.textContent = watch.cadence || '';
+
+    nodes.goldCentralQuestion.textContent = watch.central_question || '';
+    nodes.goldCentralAnswer.textContent = watch.central_answer || '';
+    nodes.goldCentralAnswer.className = `gold-central-answer ${statusClass(watch.central_status)}`;
+
+    nodes.goldMechanismCard.className = `stack-item gold-mechanism ${statusClass(watch.mechanism_status)}`;
+    nodes.goldMechanismState.textContent = watch.mechanism_state || '';
+
+    const alerts = watch.alerts || [];
+    nodes.goldAlerts.innerHTML = alerts.length
+      ? alerts.map((item) => `<div class="stack-item compact gold-alert">${escapeHtml(item)}</div>`).join('')
+      : '<div class="stack-item compact">No meaningful developments this week. No alert would be sent.</div>';
+    nodes.goldAlertRule.textContent = watch.alert_rule || '';
+
+    nodes.goldHypotheses.innerHTML = (watch.hypotheses || []).map((item) => `
+      <article class="regime-card ${statusClass(item.status)}">
+        <div class="indicator-top">
+          <div><div class="label">${escapeHtml(item.label)}</div></div>
+          <span class="tag ${statusClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
+        </div>
+        <p><strong>Test:</strong> ${escapeHtml(item.test)}</p>
+        <p class="implication"><strong>Counter-case:</strong> ${escapeHtml(item.counter_case)}</p>
+        <div class="indicator-meta"><div><strong>Signals:</strong> ${escapeHtml((item.signals || []).join(' · '))}</div></div>
+      </article>
+    `).join('');
+
+    nodes.goldSignals.innerHTML = (watch.signals || []).map((item) => `
+      <article class="indicator-card ${statusClass(item.status)}">
+        <div class="indicator-top">
+          <div>
+            <div class="label">${escapeHtml(item.label)}</div>
+            <div class="indicator-value">${escapeHtml(item.value_label || 'n/a')}</div>
+          </div>
+          <span class="tag ${statusClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
+        </div>
+        <div class="gold-tag">${escapeHtml(item.hypothesis || '')}</div>
+        <p>${escapeHtml(item.why || '')}</p>
+        <div class="indicator-meta">
+          <div><strong>Latest:</strong> ${escapeHtml(item.latest_date || 'n/a')}</div>
+          <div><strong>Cadence:</strong> ${escapeHtml(item.cadence || 'n/a')}</div>
+          <div><strong>Threshold:</strong> ${escapeHtml(item.thresholds || 'n/a')}</div>
+          <div><strong>Source:</strong> ${escapeHtml(item.source || 'n/a')}</div>
+        </div>
+        <div class="action-callout"><strong>Would confirm:</strong> ${escapeHtml(item.confirms || '')}</div>
+        <div class="action-callout gold-falsify"><strong>Would falsify:</strong> ${escapeHtml(item.falsifies || '')}</div>
+      </article>
+    `).join('');
+
+    nodes.goldManualChecks.innerHTML = (watch.manual_checks || []).map((item) => `
+      <article class="stack-item gold-check">
+        <div class="label">${escapeHtml(item.label)}</div>
+        <p>${escapeHtml(item.what)}</p>
+        <p class="implication">${escapeHtml(item.why)}</p>
+        <a class="gold-check-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">open source</a>
+      </article>
+    `).join('');
+
+    nodes.goldGuardrail.textContent = watch.guardrail || '';
+  }
+
   function pathForPoints(points, xForDate, yForValue) {
     return points.map((point, index) => {
       const command = index === 0 ? 'M' : 'L';
@@ -360,6 +439,7 @@
   renderSources();
   renderRegimes();
   renderIndicators();
+  renderGoldWatch();
   renderHistory();
   renderList(nodes.thresholdPolicy, data.threshold_policy || []);
   renderList(nodes.notesList, data.notes || []);

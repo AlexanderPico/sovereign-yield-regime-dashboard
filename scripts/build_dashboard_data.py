@@ -30,7 +30,32 @@ SERIES_CONFIG = {
     'IRLTLT01CAM156N': {'label': 'Canada 10Y government yield', 'cadence': 'Monthly', 'unit': '%', 'color': '#34d399', 'kind': 'monthly'},
     'IRLTLT01AUM156N': {'label': 'Australia 10Y government yield', 'cadence': 'Monthly', 'unit': '%', 'color': '#a78bfa', 'kind': 'monthly'},
     'IRLTLT01DEM156N': {'label': 'Germany 10Y government yield', 'cadence': 'Monthly', 'unit': '%', 'color': '#84cc16', 'kind': 'monthly'},
+    'WGCAL': {'label': 'Fed gold certificate account', 'cadence': 'Weekly Wednesday level', 'unit': 'usd_mn', 'color': '#fbbf24', 'kind': 'weekly'},
+    'IQ12260': {'label': 'Nonmonetary gold export price index', 'cadence': 'Monthly', 'unit': 'index', 'color': '#facc15', 'kind': 'monthly'},
+    'DTWEXBGS': {'label': 'Nominal broad U.S. dollar index', 'cadence': 'Daily market close', 'unit': 'index', 'color': '#22d3ee', 'kind': 'daily'},
+    'GVZCLS': {'label': 'CBOE gold ETF volatility index', 'cadence': 'Daily market close', 'unit': 'level', 'color': '#fb923c', 'kind': 'daily'},
+    'CBBTCUSD': {'label': 'Bitcoin (Coinbase USD)', 'cadence': 'Daily', 'unit': 'usd', 'color': '#f97316', 'kind': 'daily'},
 }
+
+# Gold-reset watch series are a separate lens; they must not silently enter the
+# calibrated sovereign composite.
+GOLD_WATCH_SERIES = ['WGCAL', 'IQ12260', 'DTWEXBGS', 'GVZCLS', 'CBBTCUSD']
+
+# Statutory book value of Treasury gold ($42.2222/oz) is what keeps WGCAL near
+# $11.0bn. A revaluation to market prices is the mechanical tripwire.
+GOLD_CERTIFICATE_STATUTORY_PRICE_USD_PER_OZ = 42.2222
+GOLD_CERTIFICATE_WATCH_DEVIATION_PCT = 0.25
+GOLD_CERTIFICATE_ALARM_DEVIATION_PCT = 1.00
+
+GOLD_PROXY_LOOKBACK_DAYS = 100
+DOLLAR_LOOKBACK_DAYS = 91
+BITCOIN_LOOKBACK_DAYS = 91
+WEEKLY_STALE_CALENDAR_DAYS = 14
+# DTWEXBGS is a daily series published with a roughly one-week lag, and the gold
+# trade-price index posts ~6 weeks after the reference month. Using the generic
+# daily/monthly tolerances would pin both permanently to 'stale'.
+LAGGED_DAILY_STALE_CALENDAR_DAYS = 12
+LAGGED_MONTHLY_STALE_CALENDAR_DAYS = 75
 
 DISPERSION_MEMBERS = [
     'DGS10',
@@ -100,6 +125,14 @@ def format_value(value: float | None, unit: str) -> str:
         return f'{value:.2f}%'
     if unit == 'pp':
         return f'{value * 100:.0f} bp'
+    if unit == 'usd_mn':
+        return f'${value / 1000:.2f}bn'
+    if unit == 'usd':
+        return f'${value:,.0f}'
+    if unit == 'pct_change':
+        return f'{value:+.1f}%'
+    if unit in {'index', 'level'}:
+        return f'{value:.2f}'
     return f'{value:.2f}'
 
 
@@ -185,6 +218,12 @@ def freshness_status(latest_date: str, kind: str, as_of: datetime | None = None)
     as_of_day = as_of.astimezone(timezone.utc).date()
     if kind == 'daily':
         return 'stale' if business_days_old(observation, as_of_day) > DAILY_STALE_BUSINESS_DAYS else 'fresh'
+    if kind == 'weekly':
+        return 'stale' if (as_of_day - observation).days > WEEKLY_STALE_CALENDAR_DAYS else 'fresh'
+    if kind == 'lagged_daily':
+        return 'stale' if (as_of_day - observation).days > LAGGED_DAILY_STALE_CALENDAR_DAYS else 'fresh'
+    if kind == 'lagged_monthly':
+        return 'stale' if (as_of_day - observation).days > LAGGED_MONTHLY_STALE_CALENDAR_DAYS else 'fresh'
     return 'stale' if (as_of_day - observation).days > MONTHLY_STALE_CALENDAR_DAYS else 'fresh'
 
 
@@ -433,6 +472,343 @@ def build_composite_regime(
         'investment_bias': investment_bias,
         'warning': warning,
         'disclaimer': 'Composite dashboard inference, not a forecast guarantee or personalized investment advice.',
+    }
+
+
+def pct_change_over_days(points: list[dict[str, Any]], days: int) -> float | None:
+    """Percent change between the latest print and the closest print >= `days` ago."""
+    usable = [point for point in points if point.get('value') is not None]
+    if len(usable) < 2:
+        return None
+    try:
+        latest_day = date.fromisoformat(usable[-1]['date'][:10])
+    except ValueError:
+        return None
+    cutoff = latest_day - timedelta(days=days)
+    baseline = None
+    for point in usable[:-1]:
+        try:
+            observed = date.fromisoformat(point['date'][:10])
+        except ValueError:
+            continue
+        if observed <= cutoff:
+            baseline = point
+    if baseline is None:
+        baseline = usable[0]
+    base_value = float(baseline['value'])
+    if base_value == 0:
+        return None
+    return ((float(usable[-1]['value']) / base_value) - 1.0) * 100.0
+
+
+def median_value(points: list[dict[str, Any]]) -> float | None:
+    values = sorted(float(point['value']) for point in points if point.get('value') is not None)
+    if not values:
+        return None
+    middle = len(values) // 2
+    if len(values) % 2:
+        return values[middle]
+    return (values[middle - 1] + values[middle]) / 2.0
+
+
+def gold_certificate_deviation_pct(points: list[dict[str, Any]]) -> float | None:
+    """Deviation of the latest gold-certificate level from its trailing median.
+
+    The account is carried at the statutory $42.2222/oz book value, so it is
+    close to a constant. Any persistent deviation is the mechanical fingerprint
+    of a revaluation or a certificate-issuance change, not market noise.
+    """
+    usable = [point for point in points if point.get('value') is not None]
+    if len(usable) < 4:
+        return None
+    baseline = median_value(usable[:-1])
+    if baseline in (None, 0):
+        return None
+    return ((float(usable[-1]['value']) / float(baseline)) - 1.0) * 100.0
+
+
+def classify_gold_certificate_status(deviation_pct: float | None) -> str:
+    if deviation_pct is None or not math.isfinite(deviation_pct):
+        return 'missing'
+    magnitude = abs(deviation_pct)
+    if magnitude >= GOLD_CERTIFICATE_ALARM_DEVIATION_PCT:
+        return 'alarm'
+    if magnitude >= GOLD_CERTIFICATE_WATCH_DEVIATION_PCT:
+        return 'watch'
+    return 'ok'
+
+
+def gold_watch_signal(
+    *,
+    key: str,
+    label: str,
+    value: float | None,
+    unit: str,
+    status: str,
+    latest_date: str,
+    hypothesis: str,
+    why: str,
+    thresholds: str,
+    confirms: str,
+    falsifies: str,
+    source: str,
+    cadence: str,
+) -> dict[str, Any]:
+    return {
+        'key': key,
+        'label': label,
+        'value': value,
+        'value_label': format_value(value, unit),
+        'unit': unit,
+        'status': status,
+        'latest_date': latest_date,
+        'hypothesis': hypothesis,
+        'why': why,
+        'thresholds': thresholds,
+        'confirms': confirms,
+        'falsifies': falsifies,
+        'source': source,
+        'cadence': cadence,
+    }
+
+
+def build_gold_reset_watch(
+    observations: dict[str, dict[str, Any]],
+    histories: dict[str, list[dict[str, Any]]],
+    as_of: datetime,
+) -> dict[str, Any]:
+    """Weekly gold-revaluation watch: mechanism first, market reaction second.
+
+    The central question is deliberately encoded: a one-time Treasury financing
+    operation would show up as a gold-certificate/book-value change with no
+    durable change in the dollar's monetary backing, while a regime change
+    would pair that mechanism with sustained dollar depreciation, a gold
+    repricing, and a shift in non-sovereign asset demand. Legislative and
+    Treasury/Fed statement checks cannot come from FRED, so they are surfaced
+    as explicit manual checks rather than faked as data.
+    """
+    gold_cert = observations.get('WGCAL', {'value': None, 'date': ''})
+    gold_proxy = observations.get('IQ12260', {'value': None, 'date': ''})
+    dollar = observations.get('DTWEXBGS', {'value': None, 'date': ''})
+    gold_vol = observations.get('GVZCLS', {'value': None, 'date': ''})
+    bitcoin = observations.get('CBBTCUSD', {'value': None, 'date': ''})
+
+    cert_deviation = gold_certificate_deviation_pct(histories.get('WGCAL', []))
+    cert_status = apply_freshness(
+        classify_gold_certificate_status(cert_deviation),
+        gold_cert.get('date', ''),
+        'weekly',
+        as_of,
+    )
+
+    gold_proxy_change = pct_change_over_days(histories.get('IQ12260', []), 90)
+    gold_proxy_status = apply_freshness(
+        classify_banded(gold_proxy_change, watch_high=10.0, alarm_high=20.0),
+        gold_proxy.get('date', ''),
+        'lagged_monthly',
+        as_of,
+    )
+
+    dollar_change = pct_change_over_days(histories.get('DTWEXBGS', []), 90)
+    dollar_status = apply_freshness(
+        classify_banded(dollar_change, watch_low=-3.0, alarm_low=-6.0),
+        dollar.get('date', ''),
+        'lagged_daily',
+        as_of,
+    )
+
+    gold_vol_status = apply_freshness(
+        classify_banded(gold_vol.get('value'), watch_high=28.0, alarm_high=38.0),
+        gold_vol.get('date', ''),
+        'daily',
+        as_of,
+    )
+
+    bitcoin_change = pct_change_over_days(histories.get('CBBTCUSD', []), 90)
+    bitcoin_status = apply_freshness(
+        classify_banded(bitcoin_change, watch_low=-25.0, alarm_low=-40.0),
+        bitcoin.get('date', ''),
+        'daily',
+        as_of,
+    )
+
+    signals = [
+        gold_watch_signal(
+            key='gold_certificate_deviation',
+            label='Gold certificate account deviation',
+            value=cert_deviation,
+            unit='pct_change',
+            status=cert_status,
+            latest_date=gold_cert.get('date', ''),
+            hypothesis='Mechanism',
+            why='The Treasury–Fed gold certificate account is carried at the statutory $42.2222/oz book value, so it barely moves. A step change is the most direct public evidence that the revaluation mechanism itself has been used.',
+            thresholds='OK < ±0.25% vs trailing median; watch ±0.25–0.99%; alarm ≥ ±1.00%.',
+            confirms='A sustained step up is the mechanical signature of revaluation or new certificate issuance against existing gold.',
+            falsifies='A flat account means no revaluation has occurred, no matter how far gold prices or commentary have run.',
+            source='FRED WGCAL',
+            cadence='Weekly Wednesday level',
+        ),
+        gold_watch_signal(
+            key='gold_price_proxy_change',
+            label='Gold price proxy, 3-month change',
+            value=gold_proxy_change,
+            unit='pct_change',
+            status=gold_proxy_status,
+            latest_date=gold_proxy.get('date', ''),
+            hypothesis='Context',
+            why='A public FRED-based gold repricing proxy. Rising gold alone is explicitly NOT evidence of an impending reset; it only sets the backdrop against which mechanism evidence should be read.',
+            thresholds='OK < +10% over 3 months; watch +10–19.9%; alarm ≥ +20%.',
+            confirms='A large repricing widens the gap between market value and book value, raising the fiscal attractiveness of a revaluation.',
+            falsifies='Nothing on its own. Treat this card as context, never as a reset signal.',
+            source='FRED IQ12260',
+            cadence='Monthly index (lags markets)',
+        ),
+        gold_watch_signal(
+            key='dollar_index_change',
+            label='Broad dollar index, 3-month change',
+            value=dollar_change,
+            unit='pct_change',
+            status=dollar_status,
+            latest_date=dollar.get('date', ''),
+            hypothesis='Hypothesis 1',
+            why='Hypothesis 1 requires monetary expansion and dollar depreciation. Without dollar weakness, the revaluation story is closer to an accounting and financing operation than a change in monetary backing.',
+            thresholds='OK better than -3% over 3 months; watch -3 to -5.9%; alarm ≤ -6%.',
+            confirms='Sustained depreciation alongside a mechanism change supports the durable-regime-change reading and the scarce-asset allocation case.',
+            falsifies='A firm or strengthening dollar after a credible gold-backed reform argues the reset restored confidence, which would reduce rather than increase monetary-hedge demand.',
+            source='FRED DTWEXBGS',
+            cadence='Daily market close',
+        ),
+        gold_watch_signal(
+            key='gold_volatility',
+            label='Gold ETF volatility index',
+            value=gold_vol.get('value'),
+            unit='level',
+            status=gold_vol_status,
+            latest_date=gold_vol.get('date', ''),
+            hypothesis='Hypothesis 2',
+            why='Distinguishes an orderly monetary reform from a disorderly crisis. Hypothesis 2 hinges on which of the two occurs, because a severe liquidity crisis can impair access to scarce assets instead of rewarding them.',
+            thresholds='OK < 28; watch 28–37.9; alarm ≥ 38.',
+            confirms='High gold volatility points to crisis dynamics, where forced liquidation and exchange or banking stress dominate the adoption story.',
+            falsifies='Calm gold volatility during a mechanism change favors the orderly-reform reading of Hypothesis 2.',
+            source='FRED GVZCLS',
+            cadence='Daily market close',
+        ),
+        gold_watch_signal(
+            key='bitcoin_3m_change',
+            label='Bitcoin, 3-month change',
+            value=bitcoin_change,
+            unit='pct_change',
+            status=bitcoin_status,
+            latest_date=bitcoin.get('date', ''),
+            hypothesis='Hypothesis 2',
+            why='Tests the accessibility leg directly. Bitcoin rising with a weaker dollar fits the non-sovereign-hedge path; Bitcoin falling hard while gold volatility is elevated fits the impairment path of forced liquidation and restricted access.',
+            thresholds='OK better than -25% over 3 months; watch -25 to -39.9%; alarm ≤ -40%.',
+            confirms='A deep drawdown alongside elevated gold volatility is evidence for impairment, not for crisis-driven adoption.',
+            falsifies='Bitcoin strength during dollar depreciation supports the scarce-asset reallocation reading of Hypothesis 1.',
+            source='FRED CBBTCUSD',
+            cadence='Daily',
+        ),
+    ]
+
+    signal_statuses = [item['status'] for item in signals]
+    overall_status = max_status(signal_statuses)
+    mechanism_engaged = cert_status == 'alarm'
+
+    if cert_status == 'missing':
+        mechanism_state = 'Mechanism evidence unavailable this week.'
+    elif mechanism_engaged:
+        mechanism_state = 'The gold certificate account has moved beyond its statutory-book noise band. Treat the revaluation mechanism as engaged and read the regime signals below immediately.'
+    elif cert_status == 'watch':
+        mechanism_state = 'The gold certificate account shows a small deviation from its trailing median. Verify against the H.4.1 release before treating it as a revaluation.'
+    else:
+        mechanism_state = 'No mechanical change: the gold certificate account is still sitting at its statutory book value. Rising gold prices and reset commentary are not evidence of a reset while this holds.'
+
+    if mechanism_engaged and dollar_status in {'watch', 'alarm'}:
+        central_answer = 'Evidence is leaning toward a durable change in monetary backing: the mechanism has moved and the dollar is depreciating alongside it.'
+        central_status = 'alarm'
+    elif mechanism_engaged:
+        central_answer = 'Evidence so far looks like a one-time financing and accounting operation: the mechanism has moved but the dollar has not repriced durably.'
+        central_status = 'watch'
+    else:
+        central_answer = 'Unanswered, and correctly so. Neither reading is supported until the mechanism itself changes.'
+        central_status = 'ok' if cert_status == 'ok' else cert_status
+
+    hypotheses = [
+        {
+            'key': 'h1_monetary_expansion',
+            'label': 'Hypothesis 1: revaluation drives monetary expansion and dollar depreciation',
+            'status': dollar_status if mechanism_engaged else 'ok',
+            'test': 'Requires a mechanism change plus sustained broad-dollar depreciation. Bitcoin and other scarce non-sovereign assets benefit only in that branch.',
+            'counter_case': 'A credible gold-backed reform that restores confidence in the dollar would instead reduce monetary-hedge demand, so dollar strength after a reset is a genuine falsifier, not a paradox.',
+            'signals': ['gold_certificate_deviation', 'dollar_index_change', 'bitcoin_3m_change'],
+        },
+        {
+            'key': 'h2_crisis_adoption',
+            'label': 'Hypothesis 2: the crisis itself accelerates Bitcoin adoption',
+            'status': max_status([gold_vol_status, bitcoin_status]),
+            'test': 'Depends on the crisis type. Capital controls or bank distrust favor self-custody; liquidity crises, exchange failures, network restrictions, or forced institutional liquidation impair access and price instead.',
+            'counter_case': 'Elevated gold volatility together with a deep Bitcoin drawdown is the impairment branch, which is the opposite of the adoption thesis.',
+            'signals': ['gold_volatility', 'bitcoin_3m_change'],
+        },
+    ]
+
+    manual_checks = [
+        {
+            'label': 'Gold-revaluation legislation',
+            'what': 'Search Congress.gov for bills touching the statutory gold price (31 U.S.C. §5116–5117), gold certificates, or Treasury gold revaluation.',
+            'url': 'https://www.congress.gov/quick-search/legislation?q=gold+certificate+revaluation',
+            'why': 'Actual legislative text is the precondition the analysis asks for before reading rising gold prices as an impending reset.',
+        },
+        {
+            'label': 'Treasury statements and financing plans',
+            'what': 'Check Treasury press releases and quarterly refunding statements for any reference to gold valuation or gold certificate issuance.',
+            'url': 'https://home.treasury.gov/news/press-releases',
+            'why': 'A financing operation would surface in refunding and debt-management language, not in market prices.',
+        },
+        {
+            'label': 'Fed H.4.1 gold certificate line',
+            'what': 'Reconcile the WGCAL card against the H.4.1 factors-affecting-reserve-balances release before acting on any deviation.',
+            'url': 'https://www.federalreserve.gov/releases/h41/',
+            'why': 'The Treasury–Fed gold-certificate mechanism is the actual plumbing; the FRED series is a convenience view of it.',
+        },
+        {
+            'label': 'FOMC and Fed official statements',
+            'what': 'Scan FOMC statements, minutes, and testimony for discussion of gold backing, certificate revaluation, or balance-sheet treatment of gold.',
+            'url': 'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm',
+            'why': 'A durable change in monetary backing would require explicit Fed accommodation, not just Treasury action.',
+        },
+    ]
+
+    alerts: list[str] = []
+    if cert_status == 'alarm':
+        alerts.append(f'Gold certificate account deviates {cert_deviation:+.2f}% from its trailing median: verify against H.4.1 immediately.')
+    elif cert_status == 'watch':
+        alerts.append(f'Gold certificate account deviation is {cert_deviation:+.2f}%, above the 0.25% noise band but below the alarm threshold.')
+    if dollar_status == 'alarm':
+        alerts.append('Broad dollar index is down more than 6% over three months, the Hypothesis 1 depreciation leg.')
+    if gold_vol_status == 'alarm' and bitcoin_status in {'watch', 'alarm'}:
+        alerts.append('Gold volatility is in alarm while Bitcoin is in a deep drawdown: this is the Hypothesis 2 impairment branch, not the adoption branch.')
+    if gold_proxy_status == 'alarm' and cert_status == 'ok':
+        alerts.append('Gold is repricing sharply while the certificate account is unchanged: context only, not reset evidence.')
+    if any(status == 'stale' for status in signal_statuses):
+        alerts.append('One or more gold-watch inputs are stale; confirm from the primary release before drawing conclusions.')
+
+    return {
+        'label': 'Gold Reset Watch',
+        'cadence': 'Weekly review; alerts only on meaningful developments.',
+        'status': overall_status,
+        'mechanism_status': cert_status,
+        'mechanism_state': mechanism_state,
+        'central_question': 'Would revaluation create a one-time source of Treasury financing, or would it mark a durable change in the dollar’s monetary backing?',
+        'central_answer': central_answer,
+        'central_status': central_status,
+        'hypotheses': hypotheses,
+        'signals': signals,
+        'manual_checks': manual_checks,
+        'alerts': alerts,
+        'alert_rule': 'Alert only when the mechanism moves, when a hypothesis leg crosses its threshold, or when an input goes stale. Price moves alone do not qualify.',
+        'guardrail': 'International evidence suggests revaluation can provide financing but cannot by itself solve persistent deficits. Gold price strength and instability are not evidence of an impending reset; mechanism and statement evidence are.',
+        'excluded_from_composite': True,
     }
 
 
@@ -1003,6 +1379,23 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         ],
     }
 
+    gold_reset_watch = build_gold_reset_watch(observations, histories, as_of)
+
+    gold_history_specs = [
+        ('gold_certificate_level', 'Fed gold certificate account', 'usd_mn', 'WGCAL'),
+        ('gold_price_proxy', 'Nonmonetary gold export price index', 'index', 'IQ12260'),
+        ('dollar_index', 'Nominal broad U.S. dollar index', 'index', 'DTWEXBGS'),
+        ('gold_volatility', 'CBOE gold ETF volatility index', 'level', 'GVZCLS'),
+        ('bitcoin_usd', 'Bitcoin (Coinbase USD)', 'usd', 'CBBTCUSD'),
+    ]
+    for key, label, unit, series_id in gold_history_specs:
+        points = histories.get(series_id) or []
+        if not points:
+            continue
+        history['series'].append(
+            build_history_series(key, label, unit, SERIES_CONFIG[series_id]['color'], points, [])
+        )
+
     latest_dates = [item['latest_date'] for item in indicators if item['latest_date']]
     latest_observation = max(latest_dates) if latest_dates else ''
 
@@ -1019,13 +1412,15 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         'hero_cards': hero_cards,
         'composite_regime': composite_regime,
         'regime_cards': regime_cards,
+        'gold_reset_watch': gold_reset_watch,
         'indicators': indicators,
         'history': history,
         'threshold_policy': [
             'Green / OK: keep normal review cadence; no warning is being asserted by the rules.',
             'Amber / watch: add the signal to the next macro review; do not assume a benign backdrop.',
             'Red / alarm: the rule set is explicitly flagging a non-benign sovereign-yield condition that deserves immediate review.',
-            'Gray / stale: daily prints older than 3 business days or monthly prints older than 45 calendar days are marked stale and reduce confidence in the composite.',
+            'Gold Reset Watch cards are a separate lens with their own thresholds and are deliberately excluded from the sovereign composite score.',
+            'Gray / stale: daily prints older than 3 business days or monthly prints older than 45 calendar days are marked stale and reduce confidence in the composite. Weekly prints go stale after 14 calendar days.',
             'These are transparent dashboard warnings, not investment advice or a forecast guarantee.',
         ],
         'source_status': {
@@ -1041,6 +1436,9 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
             'US 30Y was added alongside the 10Y because the extra duration can surface fiscal and term-premium stress earlier than a 10Y-only lens.',
             'Germany is the live euro-area duration anchor; the euro-area OECD aggregate (IRLTLT01EZM156N) was dropped after it stalled at 2026-01-01 on FRED.',
             'The composite stress meter follows Option A: inflation = T10YIE, growth = max(inversion, bear-steepener), divergence = dispersion + JP/CA/AU, with missing inputs excluded and weights renormalized.',
+            'Gold Reset Watch answers a narrower question: whether the Treasury–Fed gold-certificate mechanism has actually changed, not whether gold prices are rising. The mechanism card (WGCAL) is the gate; the dollar, gold-volatility, and Bitcoin cards only interpret the regime that follows.',
+            'Legislative proposals and Treasury/Fed statements cannot be pulled from FRED, so they are listed as explicit weekly manual checks with direct links rather than simulated as data.',
+            'Gold Reset Watch thresholds are intentionally excluded from the composite stress meter so an uncalibrated tail-risk lens cannot distort the sovereign-yield score.',
             'The value of the dashboard is in the explicit thresholds and action text, not in pretending bond-market interpretation is certain.',
         ],
     }
@@ -1114,6 +1512,10 @@ def build_live_payload(generated_at: str | None = None) -> dict[str, Any]:
     for series_id in SERIES_CONFIG:
         histories[series_id] = fetch_fred_series(series_id, LOOKBACK_DAYS)
 
+    # Gold-watch series are classified on their own scales, not the yield bands.
+    for series_id in GOLD_WATCH_SERIES:
+        histories[series_id] = with_status(histories.get(series_id, []), lambda value: 'present')
+
     histories['DGS10'] = with_status(histories['DGS10'], lambda value: classify_banded(value, watch_high=4.25, alarm_high=4.75))
     histories['DGS30'] = with_status(histories['DGS30'], lambda value: classify_banded(value, watch_high=4.75, alarm_high=5.10))
     histories['T10Y3M'] = with_status(histories['T10Y3M'], lambda value: classify_banded(value, watch_low=0.0, alarm_low=-0.25, watch_high=1.00, alarm_high=1.25))
@@ -1132,6 +1534,8 @@ def build_live_payload(generated_at: str | None = None) -> dict[str, Any]:
 def start_cutoff(series_id: str) -> str:
     now = datetime.now(timezone.utc)
     if series_id in {'DGS10', 'DGS2', 'DGS30', 'T10Y3M', 'T10YIE'}:
+        return (now - timedelta(days=LOOKBACK_DAYS)).date().isoformat()
+    if series_id in {'WGCAL', 'GVZCLS', 'DTWEXBGS', 'CBBTCUSD', 'IQ12260'}:
         return (now - timedelta(days=LOOKBACK_DAYS)).date().isoformat()
     return (now - timedelta(days=900)).date().isoformat()
 

@@ -1,5 +1,5 @@
 globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
-  "generated_at": "2026-09-26T16:48:53Z",
+  "generated_at": "2026-09-27T17:15:18Z",
   "title": "Sovereign Yield Regime Dashboard",
   "summary": {
     "overall_status": "alarm",
@@ -123,6 +123,153 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
       "implication": "When this is elevated, country-specific fiscal/policy narratives matter more than one-size-fits-all global-rate stories."
     }
   ],
+  "gold_reset_watch": {
+    "label": "Gold Reset Watch",
+    "cadence": "Weekly review; alerts only on meaningful developments.",
+    "status": "ok",
+    "mechanism_status": "ok",
+    "mechanism_state": "No mechanical change: the gold certificate account is still sitting at its statutory book value. Rising gold prices and reset commentary are not evidence of a reset while this holds.",
+    "central_question": "Would revaluation create a one-time source of Treasury financing, or would it mark a durable change in the dollar\u2019s monetary backing?",
+    "central_answer": "Unanswered, and correctly so. Neither reading is supported until the mechanism itself changes.",
+    "central_status": "ok",
+    "hypotheses": [
+      {
+        "key": "h1_monetary_expansion",
+        "label": "Hypothesis 1: revaluation drives monetary expansion and dollar depreciation",
+        "status": "ok",
+        "test": "Requires a mechanism change plus sustained broad-dollar depreciation. Bitcoin and other scarce non-sovereign assets benefit only in that branch.",
+        "counter_case": "A credible gold-backed reform that restores confidence in the dollar would instead reduce monetary-hedge demand, so dollar strength after a reset is a genuine falsifier, not a paradox.",
+        "signals": [
+          "gold_certificate_deviation",
+          "dollar_index_change",
+          "bitcoin_3m_change"
+        ]
+      },
+      {
+        "key": "h2_crisis_adoption",
+        "label": "Hypothesis 2: the crisis itself accelerates Bitcoin adoption",
+        "status": "ok",
+        "test": "Depends on the crisis type. Capital controls or bank distrust favor self-custody; liquidity crises, exchange failures, network restrictions, or forced institutional liquidation impair access and price instead.",
+        "counter_case": "Elevated gold volatility together with a deep Bitcoin drawdown is the impairment branch, which is the opposite of the adoption thesis.",
+        "signals": [
+          "gold_volatility",
+          "bitcoin_3m_change"
+        ]
+      }
+    ],
+    "signals": [
+      {
+        "key": "gold_certificate_deviation",
+        "label": "Gold certificate account deviation",
+        "value": 0.0,
+        "value_label": "+0.0%",
+        "unit": "pct_change",
+        "status": "ok",
+        "latest_date": "2026-09-23",
+        "hypothesis": "Mechanism",
+        "why": "The Treasury\u2013Fed gold certificate account is carried at the statutory $42.2222/oz book value, so it barely moves. A step change is the most direct public evidence that the revaluation mechanism itself has been used.",
+        "thresholds": "OK < \u00b10.25% vs trailing median; watch \u00b10.25\u20130.99%; alarm \u2265 \u00b11.00%.",
+        "confirms": "A sustained step up is the mechanical signature of revaluation or new certificate issuance against existing gold.",
+        "falsifies": "A flat account means no revaluation has occurred, no matter how far gold prices or commentary have run.",
+        "source": "FRED WGCAL",
+        "cadence": "Weekly Wednesday level"
+      },
+      {
+        "key": "gold_price_proxy_change",
+        "label": "Gold price proxy, 3-month change",
+        "value": -12.024957458876928,
+        "value_label": "-12.0%",
+        "unit": "pct_change",
+        "status": "ok",
+        "latest_date": "2026-08-01",
+        "hypothesis": "Context",
+        "why": "A public FRED-based gold repricing proxy. Rising gold alone is explicitly NOT evidence of an impending reset; it only sets the backdrop against which mechanism evidence should be read.",
+        "thresholds": "OK < +10% over 3 months; watch +10\u201319.9%; alarm \u2265 +20%.",
+        "confirms": "A large repricing widens the gap between market value and book value, raising the fiscal attractiveness of a revaluation.",
+        "falsifies": "Nothing on its own. Treat this card as context, never as a reset signal.",
+        "source": "FRED IQ12260",
+        "cadence": "Monthly index (lags markets)"
+      },
+      {
+        "key": "dollar_index_change",
+        "label": "Broad dollar index, 3-month change",
+        "value": -0.7329989916591728,
+        "value_label": "-0.7%",
+        "unit": "pct_change",
+        "status": "ok",
+        "latest_date": "2026-09-18",
+        "hypothesis": "Hypothesis 1",
+        "why": "Hypothesis 1 requires monetary expansion and dollar depreciation. Without dollar weakness, the revaluation story is closer to an accounting and financing operation than a change in monetary backing.",
+        "thresholds": "OK better than -3% over 3 months; watch -3 to -5.9%; alarm \u2264 -6%.",
+        "confirms": "Sustained depreciation alongside a mechanism change supports the durable-regime-change reading and the scarce-asset allocation case.",
+        "falsifies": "A firm or strengthening dollar after a credible gold-backed reform argues the reset restored confidence, which would reduce rather than increase monetary-hedge demand.",
+        "source": "FRED DTWEXBGS",
+        "cadence": "Daily market close"
+      },
+      {
+        "key": "gold_volatility",
+        "label": "Gold ETF volatility index",
+        "value": 23.59,
+        "value_label": "23.59",
+        "unit": "level",
+        "status": "ok",
+        "latest_date": "2026-09-22",
+        "hypothesis": "Hypothesis 2",
+        "why": "Distinguishes an orderly monetary reform from a disorderly crisis. Hypothesis 2 hinges on which of the two occurs, because a severe liquidity crisis can impair access to scarce assets instead of rewarding them.",
+        "thresholds": "OK < 28; watch 28\u201337.9; alarm \u2265 38.",
+        "confirms": "High gold volatility points to crisis dynamics, where forced liquidation and exchange or banking stress dominate the adoption story.",
+        "falsifies": "Calm gold volatility during a mechanism change favors the orderly-reform reading of Hypothesis 2.",
+        "source": "FRED GVZCLS",
+        "cadence": "Daily market close"
+      },
+      {
+        "key": "bitcoin_3m_change",
+        "label": "Bitcoin, 3-month change",
+        "value": 42.06089067925727,
+        "value_label": "+42.1%",
+        "unit": "pct_change",
+        "status": "ok",
+        "latest_date": "2026-09-26",
+        "hypothesis": "Hypothesis 2",
+        "why": "Tests the accessibility leg directly. Bitcoin rising with a weaker dollar fits the non-sovereign-hedge path; Bitcoin falling hard while gold volatility is elevated fits the impairment path of forced liquidation and restricted access.",
+        "thresholds": "OK better than -25% over 3 months; watch -25 to -39.9%; alarm \u2264 -40%.",
+        "confirms": "A deep drawdown alongside elevated gold volatility is evidence for impairment, not for crisis-driven adoption.",
+        "falsifies": "Bitcoin strength during dollar depreciation supports the scarce-asset reallocation reading of Hypothesis 1.",
+        "source": "FRED CBBTCUSD",
+        "cadence": "Daily"
+      }
+    ],
+    "manual_checks": [
+      {
+        "label": "Gold-revaluation legislation",
+        "what": "Search Congress.gov for bills touching the statutory gold price (31 U.S.C. \u00a75116\u20135117), gold certificates, or Treasury gold revaluation.",
+        "url": "https://www.congress.gov/quick-search/legislation?q=gold+certificate+revaluation",
+        "why": "Actual legislative text is the precondition the analysis asks for before reading rising gold prices as an impending reset."
+      },
+      {
+        "label": "Treasury statements and financing plans",
+        "what": "Check Treasury press releases and quarterly refunding statements for any reference to gold valuation or gold certificate issuance.",
+        "url": "https://home.treasury.gov/news/press-releases",
+        "why": "A financing operation would surface in refunding and debt-management language, not in market prices."
+      },
+      {
+        "label": "Fed H.4.1 gold certificate line",
+        "what": "Reconcile the WGCAL card against the H.4.1 factors-affecting-reserve-balances release before acting on any deviation.",
+        "url": "https://www.federalreserve.gov/releases/h41/",
+        "why": "The Treasury\u2013Fed gold-certificate mechanism is the actual plumbing; the FRED series is a convenience view of it."
+      },
+      {
+        "label": "FOMC and Fed official statements",
+        "what": "Scan FOMC statements, minutes, and testimony for discussion of gold backing, certificate revaluation, or balance-sheet treatment of gold.",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+        "why": "A durable change in monetary backing would require explicit Fed accommodation, not just Treasury action."
+      }
+    ],
+    "alerts": [],
+    "alert_rule": "Alert only when the mechanism moves, when a hypothesis leg crosses its threshold, or when an input goes stale. Price moves alone do not qualify.",
+    "guardrail": "International evidence suggests revaluation can provide financing but cannot by itself solve persistent deficits. Gold price strength and instability are not evidence of an impending reset; mechanism and statement evidence are.",
+    "excluded_from_composite": true
+  },
   "indicators": [
     {
       "key": "us_10y_yield",
@@ -666,7 +813,7 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
   ],
   "history": {
     "start_date": "2025-08-01",
-    "end_date": "2026-09-25",
+    "end_date": "2026-09-26",
     "series": [
       {
         "key": "us_10y_yield",
@@ -8585,6 +8732,5361 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
             "status": "ok"
           }
         ]
+      },
+      {
+        "key": "gold_certificate_level",
+        "label": "Fed gold certificate account",
+        "unit": "usd_mn",
+        "color": "#fbbf24",
+        "latest_status": "present",
+        "bands": [],
+        "points": [
+          {
+            "date": "2025-08-06",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-13",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-20",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-27",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-03",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-10",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-17",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-24",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-01",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-08",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-15",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-22",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-29",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-05",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-12",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-19",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-26",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-03",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-10",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-17",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-24",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-07",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-14",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-21",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-28",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-04",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-11",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-18",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-25",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-04",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-11",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-18",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-25",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-01",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-08",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-15",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-22",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-29",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-06",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-13",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-20",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-27",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-03",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-10",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-17",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-24",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-01",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-08",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-15",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-22",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-29",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-05",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-12",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-19",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 11037.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 11037.0,
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "key": "gold_price_proxy",
+        "label": "Nonmonetary gold export price index",
+        "unit": "index",
+        "color": "#facc15",
+        "latest_status": "present",
+        "bands": [],
+        "points": [
+          {
+            "date": "2025-09-01",
+            "value": 135.7,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-01",
+            "value": 156.4,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-01",
+            "value": 155.7,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-01",
+            "value": 161.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-01",
+            "value": 171.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-01",
+            "value": 186.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-01",
+            "value": 182.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-01",
+            "value": 178.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-01",
+            "value": 176.3,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-01",
+            "value": 168.5,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-01",
+            "value": 155.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "value": 155.1,
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "key": "dollar_index",
+        "label": "Nominal broad U.S. dollar index",
+        "unit": "index",
+        "color": "#22d3ee",
+        "latest_status": "present",
+        "bands": [],
+        "points": [
+          {
+            "date": "2025-08-04",
+            "value": 120.9859,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-05",
+            "value": 120.9082,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-06",
+            "value": 120.5082,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-07",
+            "value": 120.5043,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-08",
+            "value": 120.3329,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-11",
+            "value": 120.6892,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-12",
+            "value": 120.2736,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-13",
+            "value": 120.13,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-14",
+            "value": 120.6446,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-15",
+            "value": 120.3377,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-18",
+            "value": 120.5622,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-19",
+            "value": 120.7224,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-20",
+            "value": 120.7757,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-21",
+            "value": 121.0843,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-22",
+            "value": 120.2774,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-25",
+            "value": 120.4214,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-26",
+            "value": 120.5274,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-27",
+            "value": 120.7274,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-28",
+            "value": 120.2595,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 120.2082,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-02",
+            "value": 120.6837,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-03",
+            "value": 120.5052,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-04",
+            "value": 120.7629,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-05",
+            "value": 120.1282,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-08",
+            "value": 120.0971,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-09",
+            "value": 120.1569,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-10",
+            "value": 120.1223,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-11",
+            "value": 119.9534,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-12",
+            "value": 120.0611,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-15",
+            "value": 119.5644,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-16",
+            "value": 119.1348,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-17",
+            "value": 119.1582,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-18",
+            "value": 119.6616,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-19",
+            "value": 119.7858,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-22",
+            "value": 119.8152,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-23",
+            "value": 119.6202,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-24",
+            "value": 120.1707,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-25",
+            "value": 120.5419,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-26",
+            "value": 120.4349,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-29",
+            "value": 120.115,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 120.1368,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-01",
+            "value": 120.1502,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-02",
+            "value": 120.4296,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-03",
+            "value": 120.0881,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-06",
+            "value": 120.2722,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-07",
+            "value": 120.4884,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-08",
+            "value": 120.7766,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-09",
+            "value": 121.0902,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-10",
+            "value": 121.1163,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-14",
+            "value": 121.1822,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-15",
+            "value": 120.8642,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-16",
+            "value": 120.6698,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-17",
+            "value": 120.7028,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-20",
+            "value": 120.6209,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-21",
+            "value": 120.8895,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-22",
+            "value": 120.8958,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-23",
+            "value": 120.9531,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-24",
+            "value": 120.9345,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-27",
+            "value": 120.7988,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-28",
+            "value": 120.6361,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-29",
+            "value": 120.5312,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-30",
+            "value": 121.2832,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 121.3859,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-03",
+            "value": 121.4512,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-04",
+            "value": 121.8271,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-05",
+            "value": 121.8482,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-06",
+            "value": 121.6948,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-07",
+            "value": 121.388,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-10",
+            "value": 121.2984,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-12",
+            "value": 121.0458,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-13",
+            "value": 120.7725,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-14",
+            "value": 120.9666,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-17",
+            "value": 121.1146,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-18",
+            "value": 121.2127,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-19",
+            "value": 121.4978,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-20",
+            "value": 121.6889,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-21",
+            "value": 121.8653,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-24",
+            "value": 121.9171,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-25",
+            "value": 121.6335,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-26",
+            "value": 121.2437,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 121.0527,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-01",
+            "value": 120.9862,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-02",
+            "value": 121.1467,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-03",
+            "value": 120.7336,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-04",
+            "value": 120.6766,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-05",
+            "value": 120.6863,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-08",
+            "value": 120.776,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-09",
+            "value": 120.6832,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-10",
+            "value": 120.6752,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-11",
+            "value": 119.98,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-12",
+            "value": 120.1442,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-15",
+            "value": 119.9561,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-16",
+            "value": 119.8902,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-17",
+            "value": 120.155,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-18",
+            "value": 120.0528,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-19",
+            "value": 120.1652,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-22",
+            "value": 119.9912,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-23",
+            "value": 119.7057,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-24",
+            "value": 119.4372,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-26",
+            "value": 119.4723,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-29",
+            "value": 119.5899,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-30",
+            "value": 119.4939,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 119.7456,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-02",
+            "value": 119.6059,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-05",
+            "value": 119.6192,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-06",
+            "value": 119.7807,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-07",
+            "value": 119.8719,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-08",
+            "value": 120.0904,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-09",
+            "value": 120.2215,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-12",
+            "value": 119.9958,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-13",
+            "value": 120.1401,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-14",
+            "value": 119.9537,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-15",
+            "value": 119.9951,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-16",
+            "value": 120.0838,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-20",
+            "value": 119.4455,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-21",
+            "value": 119.3431,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-22",
+            "value": 119.1962,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-23",
+            "value": 118.8976,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-26",
+            "value": 118.0525,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-27",
+            "value": 117.4523,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-28",
+            "value": 117.5117,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-29",
+            "value": 117.4396,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 117.8996,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-02",
+            "value": 118.3609,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-03",
+            "value": 117.9764,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-04",
+            "value": 118.2602,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-05",
+            "value": 118.5034,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-06",
+            "value": 118.2407,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-09",
+            "value": 117.6392,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-10",
+            "value": 117.5216,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-11",
+            "value": 117.4601,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-12",
+            "value": 117.5376,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-13",
+            "value": 117.5258,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-17",
+            "value": 117.7375,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-18",
+            "value": 117.8426,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-19",
+            "value": 118.2354,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-20",
+            "value": 117.9917,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-23",
+            "value": 117.9395,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-24",
+            "value": 117.9463,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-25",
+            "value": 117.769,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-26",
+            "value": 117.9042,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 117.8223,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-02",
+            "value": 118.667,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-03",
+            "value": 119.4341,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-04",
+            "value": 119.0705,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-05",
+            "value": 119.5683,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-06",
+            "value": 119.491,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-09",
+            "value": 119.5151,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-10",
+            "value": 118.7255,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-11",
+            "value": 119.2885,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-12",
+            "value": 119.8227,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-13",
+            "value": 120.5518,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-16",
+            "value": 120.097,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-17",
+            "value": 119.8328,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-18",
+            "value": 119.9276,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-19",
+            "value": 120.1802,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-20",
+            "value": 120.2757,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-23",
+            "value": 119.9371,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-24",
+            "value": 120.1295,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-25",
+            "value": 120.1282,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-26",
+            "value": 120.389,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-27",
+            "value": 120.8851,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-30",
+            "value": 121.2851,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 121.035,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-01",
+            "value": 120.1198,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-02",
+            "value": 120.503,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-03",
+            "value": 120.6565,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-06",
+            "value": 120.4302,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-07",
+            "value": 120.32,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-08",
+            "value": 119.0596,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-09",
+            "value": 118.8998,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-10",
+            "value": 118.8552,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-13",
+            "value": 118.9916,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-14",
+            "value": 118.3581,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-15",
+            "value": 118.3623,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-16",
+            "value": 118.3616,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-17",
+            "value": 118.0795,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-20",
+            "value": 118.2374,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-21",
+            "value": 118.4331,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-22",
+            "value": 118.6004,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-23",
+            "value": 118.7155,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-24",
+            "value": 118.7294,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-27",
+            "value": 118.5458,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-28",
+            "value": 118.7717,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-29",
+            "value": 119.0975,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 118.671,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-01",
+            "value": 118.3926,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-04",
+            "value": 118.8264,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-05",
+            "value": 118.6207,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-06",
+            "value": 118.0982,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-07",
+            "value": 118.0116,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-08",
+            "value": 118.0392,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-11",
+            "value": 118.0562,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-12",
+            "value": 118.5238,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-13",
+            "value": 118.4737,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-14",
+            "value": 118.6696,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-15",
+            "value": 119.2825,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-18",
+            "value": 119.0574,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-19",
+            "value": 119.451,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-20",
+            "value": 119.1624,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-21",
+            "value": 119.369,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-22",
+            "value": 119.2868,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-26",
+            "value": 119.1696,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-27",
+            "value": 119.1829,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-28",
+            "value": 119.0318,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 118.8783,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-01",
+            "value": 119.1653,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-02",
+            "value": 119.0359,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-03",
+            "value": 119.3848,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-04",
+            "value": 119.3615,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-05",
+            "value": 120.0831,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-08",
+            "value": 120.034,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-09",
+            "value": 119.9617,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-10",
+            "value": 119.9134,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-11",
+            "value": 120.1174,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-12",
+            "value": 119.5073,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-15",
+            "value": 119.3158,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-16",
+            "value": 119.256,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-17",
+            "value": 119.3871,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-18",
+            "value": 120.3958,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-22",
+            "value": 120.5463,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-23",
+            "value": 121.0552,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-24",
+            "value": 121.412,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-25",
+            "value": 121.0559,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-26",
+            "value": 120.8866,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-29",
+            "value": 120.9525,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 120.9248,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-01",
+            "value": 121.1455,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-02",
+            "value": 120.6902,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-06",
+            "value": 120.835,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-07",
+            "value": 120.8145,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-08",
+            "value": 121.1307,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-09",
+            "value": 120.753,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-10",
+            "value": 120.5046,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-13",
+            "value": 120.7413,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-14",
+            "value": 120.4728,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-15",
+            "value": 120.3088,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-16",
+            "value": 120.331,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-17",
+            "value": 120.5315,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-20",
+            "value": 120.5401,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-21",
+            "value": 120.5779,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-22",
+            "value": 120.5736,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-23",
+            "value": 120.9075,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-24",
+            "value": 120.7105,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-27",
+            "value": 120.7739,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-28",
+            "value": 120.6247,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-29",
+            "value": 120.7892,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-30",
+            "value": 119.6753,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 119.7034,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-03",
+            "value": 119.6951,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-04",
+            "value": 119.5977,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-05",
+            "value": 119.3881,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-06",
+            "value": 119.5113,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-07",
+            "value": 119.0649,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-10",
+            "value": 119.1187,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-11",
+            "value": 119.179,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-12",
+            "value": 119.1179,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-13",
+            "value": 119.1848,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-14",
+            "value": 118.9028,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-17",
+            "value": 118.814,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-18",
+            "value": 118.9831,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-19",
+            "value": 118.3328,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-20",
+            "value": 118.2548,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-21",
+            "value": 118.0628,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-24",
+            "value": 118.3195,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-25",
+            "value": 118.2283,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 118.4461,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-27",
+            "value": 118.3583,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-28",
+            "value": 118.7479,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 118.5679,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 118.6568,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 118.5296,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 118.127,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 118.0732,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 117.9127,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 117.8834,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 118.0787,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 118.2126,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 118.6923,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 118.8822,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 118.9206,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 119.3489,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 119.5133,
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "key": "gold_volatility",
+        "label": "CBOE gold ETF volatility index",
+        "unit": "level",
+        "color": "#fb923c",
+        "latest_status": "present",
+        "bands": [],
+        "points": [
+          {
+            "date": "2025-08-04",
+            "value": 17.07,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-05",
+            "value": 16.68,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-06",
+            "value": 16.42,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-07",
+            "value": 16.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-08",
+            "value": 16.36,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-11",
+            "value": 16.94,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-12",
+            "value": 16.35,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-13",
+            "value": 15.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-14",
+            "value": 15.33,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-15",
+            "value": 15.22,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-18",
+            "value": 14.9,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-19",
+            "value": 14.82,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-20",
+            "value": 15.4,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-21",
+            "value": 15.44,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-22",
+            "value": 15.15,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-25",
+            "value": 15.09,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-26",
+            "value": 15.88,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-27",
+            "value": 15.9,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-28",
+            "value": 16.34,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 17.39,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-02",
+            "value": 19.81,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-03",
+            "value": 19.53,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-04",
+            "value": 18.33,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-05",
+            "value": 18.3,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-08",
+            "value": 19.09,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-09",
+            "value": 17.99,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-10",
+            "value": 17.37,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-11",
+            "value": 16.48,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-12",
+            "value": 16.38,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-15",
+            "value": 17.9,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-16",
+            "value": 18.37,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-17",
+            "value": 17.41,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-18",
+            "value": 16.45,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-19",
+            "value": 16.76,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-22",
+            "value": 18.43,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-23",
+            "value": 19.06,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-24",
+            "value": 18.3,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-25",
+            "value": 19.07,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-26",
+            "value": 18.59,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-29",
+            "value": 19.19,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 19.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-01",
+            "value": 19.05,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-02",
+            "value": 18.05,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-03",
+            "value": 17.66,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-06",
+            "value": 19.51,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-07",
+            "value": 19.94,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-08",
+            "value": 21.81,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-09",
+            "value": 21.85,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-10",
+            "value": 23.78,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-13",
+            "value": 24.53,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-14",
+            "value": 26.11,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-15",
+            "value": 27.12,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-16",
+            "value": 32.78,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-17",
+            "value": 31.2,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-20",
+            "value": 31.43,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-21",
+            "value": 29.82,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-22",
+            "value": 27.19,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-23",
+            "value": 26.68,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-24",
+            "value": 24.75,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-27",
+            "value": 23.94,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-28",
+            "value": 24.03,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-29",
+            "value": 24.7,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-30",
+            "value": 24.82,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 22.66,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-03",
+            "value": 21.38,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-04",
+            "value": 21.43,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-05",
+            "value": 20.15,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-06",
+            "value": 20.13,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-07",
+            "value": 20.36,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-10",
+            "value": 23.34,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-11",
+            "value": 23.33,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-12",
+            "value": 25.82,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-13",
+            "value": 24.82,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-14",
+            "value": 24.13,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-17",
+            "value": 24.07,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-18",
+            "value": 23.9,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-19",
+            "value": 23.89,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-20",
+            "value": 22.93,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-21",
+            "value": 21.93,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-24",
+            "value": 22.55,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-25",
+            "value": 22.4,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-26",
+            "value": 21.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 22.87,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-01",
+            "value": 23.34,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-02",
+            "value": 22.49,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-03",
+            "value": 21.96,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-04",
+            "value": 20.57,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-05",
+            "value": 19.92,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-08",
+            "value": 19.58,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-09",
+            "value": 20.35,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-10",
+            "value": 20.2,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-11",
+            "value": 20.97,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-12",
+            "value": 21.46,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-15",
+            "value": 21.2,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-16",
+            "value": 20.18,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-17",
+            "value": 21.22,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-18",
+            "value": 21.31,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-19",
+            "value": 20.72,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-22",
+            "value": 23.8,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-23",
+            "value": 24.53,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-24",
+            "value": 23.81,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-26",
+            "value": 25.78,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-29",
+            "value": 25.71,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-30",
+            "value": 24.83,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 23.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-02",
+            "value": 23.8,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-05",
+            "value": 24.25,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-06",
+            "value": 24.82,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-07",
+            "value": 24.13,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-08",
+            "value": 24.07,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-09",
+            "value": 23.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-12",
+            "value": 25.03,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-13",
+            "value": 23.76,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-14",
+            "value": 23.57,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-15",
+            "value": 22.06,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-16",
+            "value": 22.23,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-20",
+            "value": 24.79,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-21",
+            "value": 26.27,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-22",
+            "value": 28.11,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-23",
+            "value": 30.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-26",
+            "value": 32.7,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-27",
+            "value": 33.13,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-28",
+            "value": 39.67,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-29",
+            "value": 46.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 44.08,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-02",
+            "value": 37.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-03",
+            "value": 41.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-04",
+            "value": 36.93,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-05",
+            "value": 35.53,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-06",
+            "value": 33.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-09",
+            "value": 32.84,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-10",
+            "value": 28.86,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-11",
+            "value": 29.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-12",
+            "value": 30.23,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-13",
+            "value": 30.84,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-17",
+            "value": 33.24,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-18",
+            "value": 33.75,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-19",
+            "value": 33.56,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-20",
+            "value": 36.44,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-23",
+            "value": 38.46,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-24",
+            "value": 37.55,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-25",
+            "value": 34.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-26",
+            "value": 33.07,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 33.23,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-02",
+            "value": 34.83,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-03",
+            "value": 38.77,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-04",
+            "value": 36.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-05",
+            "value": 35.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-06",
+            "value": 34.26,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-09",
+            "value": 33.52,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-10",
+            "value": 32.11,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-11",
+            "value": 30.68,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-12",
+            "value": 31.09,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-13",
+            "value": 32.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-16",
+            "value": 30.56,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-17",
+            "value": 27.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-18",
+            "value": 29.42,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-19",
+            "value": 31.05,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-20",
+            "value": 35.25,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-23",
+            "value": 43.36,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-24",
+            "value": 41.9,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-25",
+            "value": 38.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-26",
+            "value": 45.07,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-27",
+            "value": 45.51,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-30",
+            "value": 42.71,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 38.89,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-01",
+            "value": 36.11,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-02",
+            "value": 37.85,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-06",
+            "value": 37.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-07",
+            "value": 37.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-08",
+            "value": 34.21,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-09",
+            "value": 31.66,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-10",
+            "value": 30.46,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-13",
+            "value": 30.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-14",
+            "value": 31.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-15",
+            "value": 29.97,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-16",
+            "value": 28.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-17",
+            "value": 28.95,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-20",
+            "value": 28.46,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-21",
+            "value": 29.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-22",
+            "value": 27.09,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-23",
+            "value": 27.87,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-24",
+            "value": 25.88,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-27",
+            "value": 25.37,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-28",
+            "value": 26.19,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-29",
+            "value": 27.77,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 26.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-01",
+            "value": 26.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-04",
+            "value": 27.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-05",
+            "value": 26.61,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-06",
+            "value": 26.34,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-07",
+            "value": 27.03,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-08",
+            "value": 26.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-11",
+            "value": 27.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-12",
+            "value": 27.16,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-13",
+            "value": 26.56,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-14",
+            "value": 25.79,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-15",
+            "value": 26.34,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-18",
+            "value": 26.2,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-19",
+            "value": 26.63,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-20",
+            "value": 25.17,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-21",
+            "value": 24.59,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-22",
+            "value": 23.86,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-26",
+            "value": 24.27,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-27",
+            "value": 24.47,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-28",
+            "value": 24.83,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 24.91,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-01",
+            "value": 25.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-02",
+            "value": 24.44,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-03",
+            "value": 24.49,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-04",
+            "value": 23.87,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-05",
+            "value": 28.89,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-08",
+            "value": 27.17,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-09",
+            "value": 28.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-10",
+            "value": 32.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-11",
+            "value": 28.33,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-12",
+            "value": 26.85,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-15",
+            "value": 26.47,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-16",
+            "value": 25.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-17",
+            "value": 28.45,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-18",
+            "value": 27.9,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-22",
+            "value": 26.15,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-23",
+            "value": 27.41,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-24",
+            "value": 31.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-25",
+            "value": 29.58,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-26",
+            "value": 27.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-29",
+            "value": 27.7,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 27.2,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-01",
+            "value": 27.12,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-02",
+            "value": 26.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-06",
+            "value": 25.33,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-07",
+            "value": 26.21,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-08",
+            "value": 27.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-09",
+            "value": 25.33,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-10",
+            "value": 23.95,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-13",
+            "value": 26.93,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-14",
+            "value": 25.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-15",
+            "value": 24.88,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-16",
+            "value": 26.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-17",
+            "value": 25.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-20",
+            "value": 25.37,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-21",
+            "value": 23.94,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-22",
+            "value": 24.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-23",
+            "value": 25.14,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-24",
+            "value": 24.33,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-27",
+            "value": 24.13,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-28",
+            "value": 24.62,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-29",
+            "value": 24.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-30",
+            "value": 24.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 23.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-03",
+            "value": 23.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-04",
+            "value": 23.5,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-05",
+            "value": 25.59,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-06",
+            "value": 24.86,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-07",
+            "value": 25.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-10",
+            "value": 27.9,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-11",
+            "value": 25.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-12",
+            "value": 25.58,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-13",
+            "value": 23.87,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-14",
+            "value": 23.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-17",
+            "value": 25.12,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-18",
+            "value": 23.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-19",
+            "value": 26.68,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-20",
+            "value": 27.28,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-21",
+            "value": 27.29,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-24",
+            "value": 28.28,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-25",
+            "value": 27.69,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 26.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-27",
+            "value": 26.8,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-28",
+            "value": 25.17,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 24.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 25.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 26.14,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 27.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 26.63,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 27.26,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 27.79,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 28.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 25.68,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 26.54,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 26.9,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 26.55,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 24.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 23.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 23.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 23.59,
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "key": "bitcoin_usd",
+        "label": "Bitcoin (Coinbase USD)",
+        "unit": "usd",
+        "color": "#f97316",
+        "latest_status": "present",
+        "bands": [],
+        "points": [
+          {
+            "date": "2025-08-03",
+            "value": 115051.85,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-04",
+            "value": 114112.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-05",
+            "value": 115028.83,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-06",
+            "value": 117515.49,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-07",
+            "value": 116683.79,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-08",
+            "value": 116492.51,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-09",
+            "value": 119309.37,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-10",
+            "value": 118701.84,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-11",
+            "value": 120113.18,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-12",
+            "value": 123365.63,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-13",
+            "value": 118389.79,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-14",
+            "value": 117436.96,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-15",
+            "value": 117455.68,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-16",
+            "value": 117488.6,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-17",
+            "value": 116286.76,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-18",
+            "value": 112856.19,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-19",
+            "value": 114276.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-20",
+            "value": 112480.3,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-21",
+            "value": 116908.68,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-22",
+            "value": 115383.87,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-23",
+            "value": 113478.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-24",
+            "value": 110127.74,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-25",
+            "value": 111788.01,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-26",
+            "value": 111253.21,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-27",
+            "value": 112574.85,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-28",
+            "value": 108378.32,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 108827.93,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-30",
+            "value": 108247.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-08-31",
+            "value": 109240.55,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-01",
+            "value": 111247.94,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-02",
+            "value": 111756.41,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-03",
+            "value": 110720.79,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-04",
+            "value": 110670.02,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-05",
+            "value": 110212.6,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-06",
+            "value": 111129.61,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-07",
+            "value": 112072.57,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-08",
+            "value": 111549.32,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-09",
+            "value": 113983.97,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-10",
+            "value": 115540.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-11",
+            "value": 116106.03,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-12",
+            "value": 115968.35,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-13",
+            "value": 115314.13,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-14",
+            "value": 115381.08,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-15",
+            "value": 116832.56,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-16",
+            "value": 116484.4,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-17",
+            "value": 117117.99,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-18",
+            "value": 115690.55,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-19",
+            "value": 115752.4,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-20",
+            "value": 115282.27,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-21",
+            "value": 112736.59,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-22",
+            "value": 112017.21,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-23",
+            "value": 113348.17,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-24",
+            "value": 109035.72,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-25",
+            "value": 109697.29,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-26",
+            "value": 109681.16,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-27",
+            "value": 112197.67,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-28",
+            "value": 114365.07,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-29",
+            "value": 114067.71,
+            "status": "present"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 118659.97,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-01",
+            "value": 120621.32,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-02",
+            "value": 122318.4,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-03",
+            "value": 122458.56,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-04",
+            "value": 123520.79,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-05",
+            "value": 124720.09,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-06",
+            "value": 121393.95,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-07",
+            "value": 123343.25,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-08",
+            "value": 121714.51,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-09",
+            "value": 112980.28,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-10",
+            "value": 110768.89,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-11",
+            "value": 115067.98,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-12",
+            "value": 115274.03,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-13",
+            "value": 113068.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-14",
+            "value": 110804.12,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-15",
+            "value": 108198.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-16",
+            "value": 106463.3,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-17",
+            "value": 107208.91,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-18",
+            "value": 108676.78,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-19",
+            "value": 110568.06,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-20",
+            "value": 108362.27,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-21",
+            "value": 107585.98,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-22",
+            "value": 110116.03,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-23",
+            "value": 111042.13,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-24",
+            "value": 111666.21,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-25",
+            "value": 114548.09,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-26",
+            "value": 114087.06,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-27",
+            "value": 112906.75,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-28",
+            "value": 110032.13,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-29",
+            "value": 108308.18,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-30",
+            "value": 109555.27,
+            "status": "present"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 110052.25,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-01",
+            "value": 110536.01,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-02",
+            "value": 106557.98,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-03",
+            "value": 101468.15,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-04",
+            "value": 100291.85,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-05",
+            "value": 103472.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-06",
+            "value": 101447.93,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-07",
+            "value": 102882.15,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-08",
+            "value": 101838.43,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-09",
+            "value": 106496.49,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-10",
+            "value": 106071.01,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-11",
+            "value": 102734.93,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-12",
+            "value": 101945.44,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-13",
+            "value": 98906.39,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-14",
+            "value": 94829.23,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-15",
+            "value": 95095.36,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-16",
+            "value": 95197.96,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-17",
+            "value": 91855.7,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-18",
+            "value": 92184.51,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-19",
+            "value": 91783.66,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-20",
+            "value": 87214.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-21",
+            "value": 84826.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-22",
+            "value": 85133.92,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-23",
+            "value": 86499.25,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-24",
+            "value": 87981.12,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-25",
+            "value": 87366.12,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-26",
+            "value": 90635.53,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-27",
+            "value": 91094.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 90919.78,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-29",
+            "value": 90946.75,
+            "status": "present"
+          },
+          {
+            "date": "2025-11-30",
+            "value": 87446.89,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-01",
+            "value": 86628.25,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-02",
+            "value": 91532.75,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-03",
+            "value": 93150.03,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-04",
+            "value": 92353.31,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-05",
+            "value": 89347.18,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-06",
+            "value": 89480.46,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-07",
+            "value": 90435.42,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-08",
+            "value": 90338.37,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-09",
+            "value": 92243.57,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-10",
+            "value": 91194.97,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-11",
+            "value": 91784.59,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-12",
+            "value": 90350.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-13",
+            "value": 90326.01,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-14",
+            "value": 88460.01,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-15",
+            "value": 85950.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-16",
+            "value": 87599.87,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-17",
+            "value": 86064.34,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-18",
+            "value": 85352.25,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-19",
+            "value": 88016.09,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-20",
+            "value": 88322.39,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-21",
+            "value": 88716.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-22",
+            "value": 88837.97,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-23",
+            "value": 87594.74,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-24",
+            "value": 87516.0,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-25",
+            "value": 87159.35,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-26",
+            "value": 87280.65,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-27",
+            "value": 87844.66,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-28",
+            "value": 88029.48,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-29",
+            "value": 87055.23,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-30",
+            "value": 88185.26,
+            "status": "present"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 87696.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-01",
+            "value": 88642.88,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-02",
+            "value": 90112.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-03",
+            "value": 91351.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-04",
+            "value": 92392.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-05",
+            "value": 93891.94,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-06",
+            "value": 92771.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-07",
+            "value": 91377.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-08",
+            "value": 91246.53,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-09",
+            "value": 90476.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-10",
+            "value": 90509.91,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-11",
+            "value": 91538.05,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-12",
+            "value": 91293.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-13",
+            "value": 95222.7,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-14",
+            "value": 96852.91,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-15",
+            "value": 95569.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-16",
+            "value": 95467.76,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-17",
+            "value": 95015.57,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-18",
+            "value": 92624.74,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-19",
+            "value": 92572.21,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-20",
+            "value": 88916.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-21",
+            "value": 89936.47,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-22",
+            "value": 89522.33,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-23",
+            "value": 89365.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-24",
+            "value": 89155.13,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-25",
+            "value": 86978.89,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-26",
+            "value": 88136.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-27",
+            "value": 89296.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-28",
+            "value": 88963.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-29",
+            "value": 83943.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 83986.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-01-31",
+            "value": 78727.3,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-01",
+            "value": 77831.33,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-02",
+            "value": 78938.16,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-03",
+            "value": 76313.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-04",
+            "value": 72853.79,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-05",
+            "value": 63845.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-06",
+            "value": 69936.2,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-07",
+            "value": 69199.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-08",
+            "value": 70477.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-09",
+            "value": 69986.8,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-10",
+            "value": 69219.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-11",
+            "value": 67479.13,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-12",
+            "value": 66001.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-13",
+            "value": 68970.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-14",
+            "value": 69801.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-15",
+            "value": 68913.72,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-16",
+            "value": 68810.28,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-17",
+            "value": 67191.37,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-18",
+            "value": 66533.36,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-19",
+            "value": 67214.29,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-20",
+            "value": 67885.32,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-21",
+            "value": 67969.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-22",
+            "value": 66238.9,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-23",
+            "value": 64743.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-24",
+            "value": 64290.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-25",
+            "value": 68448.27,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-26",
+            "value": 67068.86,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 65950.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-02-28",
+            "value": 66680.36,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-01",
+            "value": 66474.29,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-02",
+            "value": 69016.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-03",
+            "value": 68222.81,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-04",
+            "value": 72776.66,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-05",
+            "value": 70955.49,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-06",
+            "value": 68350.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-07",
+            "value": 67193.87,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-08",
+            "value": 66055.14,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-09",
+            "value": 68480.54,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-10",
+            "value": 69847.95,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-11",
+            "value": 70210.72,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-12",
+            "value": 70500.54,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-13",
+            "value": 70838.78,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-14",
+            "value": 71118.53,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-15",
+            "value": 72953.27,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-16",
+            "value": 74758.54,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-17",
+            "value": 73845.35,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-18",
+            "value": 71204.95,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-19",
+            "value": 69858.95,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-20",
+            "value": 70560.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-21",
+            "value": 68398.68,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-22",
+            "value": 67977.71,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-23",
+            "value": 70906.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-24",
+            "value": 70555.44,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-25",
+            "value": 71277.56,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-26",
+            "value": 68762.2,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-27",
+            "value": 66390.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-28",
+            "value": 66392.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-29",
+            "value": 65862.79,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-30",
+            "value": 66683.77,
+            "status": "present"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 68133.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-01",
+            "value": 68100.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-02",
+            "value": 66959.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-03",
+            "value": 66911.51,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-04",
+            "value": 67284.16,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-05",
+            "value": 69279.05,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-06",
+            "value": 68909.06,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-07",
+            "value": 71872.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-08",
+            "value": 71015.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-09",
+            "value": 71798.73,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-10",
+            "value": 72905.26,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-11",
+            "value": 72997.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-12",
+            "value": 70661.26,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-13",
+            "value": 74505.1,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-14",
+            "value": 74386.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-15",
+            "value": 74725.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-16",
+            "value": 75124.72,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-17",
+            "value": 75736.82,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-18",
+            "value": 73823.14,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-19",
+            "value": 74201.44,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-20",
+            "value": 75854.66,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-21",
+            "value": 76434.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-22",
+            "value": 78416.36,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-23",
+            "value": 78281.09,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-24",
+            "value": 77490.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-25",
+            "value": 77650.51,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-26",
+            "value": 78818.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-27",
+            "value": 77302.47,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-28",
+            "value": 76361.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-29",
+            "value": 75794.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 76442.08,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-01",
+            "value": 78285.16,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-02",
+            "value": 78705.06,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-03",
+            "value": 78496.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-04",
+            "value": 79926.19,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-05",
+            "value": 81028.26,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-06",
+            "value": 81476.51,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-07",
+            "value": 80047.2,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-08",
+            "value": 80150.27,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-09",
+            "value": 80645.62,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-10",
+            "value": 82103.78,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-11",
+            "value": 81734.25,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-12",
+            "value": 80414.77,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-13",
+            "value": 79371.63,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-14",
+            "value": 79142.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-15",
+            "value": 79026.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-16",
+            "value": 78183.58,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-17",
+            "value": 77269.08,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-18",
+            "value": 76952.14,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-19",
+            "value": 76799.23,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-20",
+            "value": 77494.61,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-21",
+            "value": 77451.06,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-22",
+            "value": 75478.44,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-23",
+            "value": 76627.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-24",
+            "value": 77078.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-25",
+            "value": 77196.83,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-26",
+            "value": 75834.53,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-27",
+            "value": 74422.7,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-28",
+            "value": 74025.1,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 73897.41,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-30",
+            "value": 73758.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-05-31",
+            "value": 73688.35,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-01",
+            "value": 71263.63,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-02",
+            "value": 66661.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-03",
+            "value": 64257.19,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-04",
+            "value": 63742.66,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-05",
+            "value": 61272.32,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-06",
+            "value": 60881.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-07",
+            "value": 63216.78,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-08",
+            "value": 63049.86,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-09",
+            "value": 61751.94,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-10",
+            "value": 61570.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-11",
+            "value": 63482.72,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-12",
+            "value": 63554.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "value": 64374.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-14",
+            "value": 65605.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-15",
+            "value": 66231.94,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-16",
+            "value": 65679.13,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-17",
+            "value": 64529.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-18",
+            "value": 62852.71,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-19",
+            "value": 63522.76,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "value": 64180.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-21",
+            "value": 63321.17,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-22",
+            "value": 63932.91,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-23",
+            "value": 62689.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-24",
+            "value": 60950.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-25",
+            "value": 59778.75,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-26",
+            "value": 59995.84,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "value": 59964.66,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-28",
+            "value": 59367.05,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-29",
+            "value": 60128.09,
+            "status": "present"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 58585.96,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-01",
+            "value": 59881.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-02",
+            "value": 61422.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-03",
+            "value": 62537.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "value": 63027.09,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-05",
+            "value": 63577.07,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-06",
+            "value": 63980.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-07",
+            "value": 63367.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-08",
+            "value": 62168.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-09",
+            "value": 63156.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-10",
+            "value": 64057.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "value": 63831.03,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-12",
+            "value": 63809.21,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-13",
+            "value": 62233.29,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-14",
+            "value": 64967.74,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-15",
+            "value": 64755.57,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-16",
+            "value": 63746.78,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-17",
+            "value": 63900.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "value": 64793.76,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-19",
+            "value": 64571.18,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-20",
+            "value": 65151.3,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-21",
+            "value": 66553.73,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-22",
+            "value": 66063.67,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-23",
+            "value": 65000.99,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-24",
+            "value": 64108.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-25",
+            "value": 64319.9,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-26",
+            "value": 65243.31,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-27",
+            "value": 63692.68,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-28",
+            "value": 63945.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-29",
+            "value": 63896.15,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-30",
+            "value": 64817.71,
+            "status": "present"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 62886.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "value": 62835.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-02",
+            "value": 63443.93,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-03",
+            "value": 63503.04,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-04",
+            "value": 64023.39,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-05",
+            "value": 64555.45,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-06",
+            "value": 64291.84,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-07",
+            "value": 64877.34,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "value": 64910.12,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-09",
+            "value": 64855.5,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-10",
+            "value": 63876.26,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-11",
+            "value": 63528.48,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-12",
+            "value": 63402.49,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-13",
+            "value": 63387.81,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-14",
+            "value": 62968.43,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "value": 62999.01,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-16",
+            "value": 62859.47,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-17",
+            "value": 64423.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-18",
+            "value": 64625.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-19",
+            "value": 69487.6,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-20",
+            "value": 73086.97,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-21",
+            "value": 78126.63,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "value": 77117.73,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-23",
+            "value": 77637.69,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-24",
+            "value": 78981.39,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-25",
+            "value": 78510.95,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 78961.93,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-27",
+            "value": 80209.61,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-28",
+            "value": 77838.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-29",
+            "value": 78215.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-30",
+            "value": 77757.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 78603.02,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 77392.65,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 77330.23,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 81129.19,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 79658.55,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-05",
+            "value": 79879.24,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-06",
+            "value": 80309.06,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-07",
+            "value": 79067.23,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 78548.91,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 78303.59,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 76664.89,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 77276.5,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-12",
+            "value": 77270.73,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-13",
+            "value": 76804.92,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 78200.38,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 75656.09,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 76208.64,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 76366.4,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 80844.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-19",
+            "value": 81186.0,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-20",
+            "value": 81253.37,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 86396.74,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 86249.98,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 84452.97,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 84470.76,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-25",
+            "value": 84048.07,
+            "status": "present"
+          },
+          {
+            "date": "2026-09-26",
+            "value": 84337.36,
+            "status": "present"
+          }
+        ]
       }
     ]
   },
@@ -8592,7 +14094,8 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     "Green / OK: keep normal review cadence; no warning is being asserted by the rules.",
     "Amber / watch: add the signal to the next macro review; do not assume a benign backdrop.",
     "Red / alarm: the rule set is explicitly flagging a non-benign sovereign-yield condition that deserves immediate review.",
-    "Gray / stale: daily prints older than 3 business days or monthly prints older than 45 calendar days are marked stale and reduce confidence in the composite.",
+    "Gold Reset Watch cards are a separate lens with their own thresholds and are deliberately excluded from the sovereign composite score.",
+    "Gray / stale: daily prints older than 3 business days or monthly prints older than 45 calendar days are marked stale and reduce confidence in the composite. Weekly prints go stale after 14 calendar days.",
     "These are transparent dashboard warnings, not investment advice or a forecast guarantee."
   ],
   "source_status": {
@@ -8605,7 +14108,12 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     "IRLTLT01JPM156N": "present",
     "IRLTLT01CAM156N": "present",
     "IRLTLT01AUM156N": "present",
-    "IRLTLT01DEM156N": "present"
+    "IRLTLT01DEM156N": "present",
+    "WGCAL": "present",
+    "IQ12260": "present",
+    "DTWEXBGS": "present",
+    "GVZCLS": "present",
+    "CBBTCUSD": "present"
   },
   "tracked_sources": [
     {
@@ -8657,6 +14165,31 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
       "series_id": "IRLTLT01DEM156N",
       "label": "Germany 10Y government yield",
       "cadence": "Monthly"
+    },
+    {
+      "series_id": "WGCAL",
+      "label": "Fed gold certificate account",
+      "cadence": "Weekly Wednesday level"
+    },
+    {
+      "series_id": "IQ12260",
+      "label": "Nonmonetary gold export price index",
+      "cadence": "Monthly"
+    },
+    {
+      "series_id": "DTWEXBGS",
+      "label": "Nominal broad U.S. dollar index",
+      "cadence": "Daily market close"
+    },
+    {
+      "series_id": "GVZCLS",
+      "label": "CBOE gold ETF volatility index",
+      "cadence": "Daily market close"
+    },
+    {
+      "series_id": "CBBTCUSD",
+      "label": "Bitcoin (Coinbase USD)",
+      "cadence": "Daily"
     }
   ],
   "notes": [
@@ -8666,6 +14199,9 @@ globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
     "US 30Y was added alongside the 10Y because the extra duration can surface fiscal and term-premium stress earlier than a 10Y-only lens.",
     "Germany is the live euro-area duration anchor; the euro-area OECD aggregate (IRLTLT01EZM156N) was dropped after it stalled at 2026-01-01 on FRED.",
     "The composite stress meter follows Option A: inflation = T10YIE, growth = max(inversion, bear-steepener), divergence = dispersion + JP/CA/AU, with missing inputs excluded and weights renormalized.",
+    "Gold Reset Watch answers a narrower question: whether the Treasury\u2013Fed gold-certificate mechanism has actually changed, not whether gold prices are rising. The mechanism card (WGCAL) is the gate; the dollar, gold-volatility, and Bitcoin cards only interpret the regime that follows.",
+    "Legislative proposals and Treasury/Fed statements cannot be pulled from FRED, so they are listed as explicit weekly manual checks with direct links rather than simulated as data.",
+    "Gold Reset Watch thresholds are intentionally excluded from the composite stress meter so an uncalibrated tail-risk lens cannot distort the sovereign-yield score.",
     "The value of the dashboard is in the explicit thresholds and action text, not in pretending bond-market interpretation is certain."
   ]
 };
