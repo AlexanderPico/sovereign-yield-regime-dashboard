@@ -29,7 +29,7 @@ Current indicators:
 
 Plus a separate weekly **Gold Reset Watch** lens:
 - gold certificate account deviation (the Treasury–Fed revaluation mechanism gate)
-- gold price proxy, 3-month change (context only)
+- gold price proxy, 3-month change (daily gold ETF close; context only)
 - broad dollar index, 3-month change (Hypothesis 1 leg)
 - gold ETF volatility index (orderly reform vs disorderly crisis)
 - Bitcoin, 3-month change (Hypothesis 2 adoption vs impairment leg)
@@ -142,18 +142,24 @@ The design is mechanism-first:
    ±1.00% of its trailing median is the most direct public evidence that revaluation has actually
    been used. While this card is green, rising gold prices and reset commentary are **not**
    evidence of an impending reset.
-2. **The central question.** Would revaluation create a one-time source of Treasury financing, or
+2. **Daily gold, with a visible fallback.** FRED no longer publishes a daily gold fix, so the
+   gold price card reads a daily gold ETF close (`GLD`, falling back to `IAU`) from Yahoo
+   Finance. This is the only non-FRED source in the build and it is strictly optional: if the
+   fetch fails (e.g. a blocked CI runner), the card degrades to the lagging monthly
+   `IQ12260` index, is tagged `degraded source` in the UI, and raises an alert — the Pages
+   build never fails because of it.
+3. **The central question.** Would revaluation create a one-time source of Treasury financing, or
    a durable change in the dollar's monetary backing? The panel answers this conservatively:
    unanswered until the mechanism moves, then "one-time financing" if the dollar holds firm and
    "durable change" only if the dollar depreciates alongside it.
-3. **Two testable hypotheses**, each with an explicit counter-case:
+4. **Two testable hypotheses**, each with an explicit counter-case:
    - *H1: revaluation drives monetary expansion and dollar depreciation.* Needs mechanism plus
      sustained broad-dollar weakness. A credible reform that restores dollar confidence would
      instead reduce monetary-hedge demand, so dollar strength is a real falsifier.
    - *H2: the crisis itself accelerates Bitcoin adoption.* Depends on crisis type. Elevated gold
      volatility with a deep Bitcoin drawdown is the impairment branch (forced liquidation,
      exchange failures, restricted access), not the adoption branch.
-4. **Manual checks.** Legislative proposals and Treasury/Fed statements cannot be pulled from
+5. **Manual checks.** Legislative proposals and Treasury/Fed statements cannot be pulled from
    FRED, so the panel links them as explicit weekly checks rather than simulating them as data:
    Congress.gov legislation search, Treasury press releases, the Fed H.4.1 gold certificate line,
    and the FOMC calendar.

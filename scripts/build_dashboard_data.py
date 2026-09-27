@@ -51,6 +51,17 @@ GOLD_PROXY_LOOKBACK_DAYS = 100
 DOLLAR_LOOKBACK_DAYS = 91
 BITCOIN_LOOKBACK_DAYS = 91
 WEEKLY_STALE_CALENDAR_DAYS = 14
+
+# Daily gold price proxy. FRED dropped the LBMA gold fix, so the only public
+# no-key daily gold series available is an ETF close. GLD tracks spot closely
+# enough for a 3-month percent-change read; IAU is a same-exposure backup if
+# GLD is unavailable. This is the ONE non-FRED source in the build, so it is
+# strictly optional: a failure degrades the card to the monthly trade index
+# rather than failing the nightly Pages deploy.
+GOLD_ETF_SYMBOLS = ['GLD', 'IAU']
+GOLD_ETF_KEY = 'GLD_DAILY'
+YAHOO_CHART_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/'
+YAHOO_TIMEOUT_SECONDS = 15
 # DTWEXBGS is a daily series published with a roughly one-week lag, and the gold
 # trade-price index posts ~6 weeks after the reference month. Using the generic
 # daily/monthly tolerances would pin both permanently to 'stale'.
@@ -498,7 +509,10 @@ def pct_change_over_days(points: list[dict[str, Any]], days: int) -> float | Non
     base_value = float(baseline['value'])
     if base_value == 0:
         return None
-    return ((float(usable[-1]['value']) / base_value) - 1.0) * 100.0
+    change = ((float(usable[-1]['value']) / base_value) - 1.0) * 100.0
+    # Round before threshold comparison: an exact +20% move otherwise computes
+    # as 19.999999999999996 and silently lands one band too low.
+    return round(change, 6)
 
 
 def median_value(points: list[dict[str, Any]]) -> float | None:
@@ -553,6 +567,7 @@ def gold_watch_signal(
     falsifies: str,
     source: str,
     cadence: str,
+    degraded: bool = False,
 ) -> dict[str, Any]:
     return {
         'key': key,
@@ -569,6 +584,7 @@ def gold_watch_signal(
         'falsifies': falsifies,
         'source': source,
         'cadence': cadence,
+        'degraded': degraded,
     }
 
 
@@ -601,13 +617,45 @@ def build_gold_reset_watch(
         as_of,
     )
 
-    gold_proxy_change = pct_change_over_days(histories.get('IQ12260', []), 90)
-    gold_proxy_status = apply_freshness(
-        classify_banded(gold_proxy_change, watch_high=10.0, alarm_high=20.0),
-        gold_proxy.get('date', ''),
-        'lagged_monthly',
-        as_of,
-    )
+    gold_etf_points = histories.get(GOLD_ETF_KEY) or []
+    gold_etf_obs = observations.get(GOLD_ETF_KEY)
+
+    if gold_etf_obs is not None and len(gold_etf_points) >= 2:
+        gold_symbol = gold_etf_obs.get('series_id') or GOLD_ETF_SYMBOLS[0]
+        gold_proxy_change = pct_change_over_days(gold_etf_points, 90)
+        gold_proxy_date = gold_etf_obs.get('date', '')
+        gold_proxy_status = apply_freshness(
+            classify_banded(gold_proxy_change, watch_high=10.0, alarm_high=20.0),
+            gold_proxy_date,
+            'daily',
+            as_of,
+        )
+        gold_proxy_source = f'Yahoo Finance {gold_symbol} daily close (spot proxy)'
+        gold_proxy_cadence = 'Daily market close'
+        gold_proxy_why = (
+            f'A daily gold repricing proxy via the {gold_symbol} ETF close, used because FRED no longer '
+            'publishes a daily gold fix. Rising gold alone is explicitly NOT evidence of an impending '
+            'reset; it only sets the backdrop against which mechanism evidence should be read.'
+        )
+        gold_proxy_degraded = False
+    else:
+        gold_proxy_change = pct_change_over_days(histories.get('IQ12260', []), 90)
+        gold_proxy_date = gold_proxy.get('date', '')
+        gold_proxy_status = apply_freshness(
+            classify_banded(gold_proxy_change, watch_high=10.0, alarm_high=20.0),
+            gold_proxy_date,
+            'lagged_monthly',
+            as_of,
+        )
+        gold_proxy_source = 'FRED IQ12260 (monthly fallback; daily ETF proxy unavailable)'
+        gold_proxy_cadence = 'Monthly index fallback (lags markets)'
+        gold_proxy_why = (
+            'Fallback monthly gold repricing proxy: the daily ETF close could not be retrieved this '
+            'run, so this card is running degraded and lags the market by weeks. Rising gold alone is '
+            'explicitly NOT evidence of an impending reset; it only sets the backdrop against which '
+            'mechanism evidence should be read.'
+        )
+        gold_proxy_degraded = True
 
     dollar_change = pct_change_over_days(histories.get('DTWEXBGS', []), 90)
     dollar_status = apply_freshness(
@@ -654,14 +702,15 @@ def build_gold_reset_watch(
             value=gold_proxy_change,
             unit='pct_change',
             status=gold_proxy_status,
-            latest_date=gold_proxy.get('date', ''),
+            latest_date=gold_proxy_date,
             hypothesis='Context',
-            why='A public FRED-based gold repricing proxy. Rising gold alone is explicitly NOT evidence of an impending reset; it only sets the backdrop against which mechanism evidence should be read.',
+            why=gold_proxy_why,
             thresholds='OK < +10% over 3 months; watch +10–19.9%; alarm ≥ +20%.',
             confirms='A large repricing widens the gap between market value and book value, raising the fiscal attractiveness of a revaluation.',
             falsifies='Nothing on its own. Treat this card as context, never as a reset signal.',
-            source='FRED IQ12260',
-            cadence='Monthly index (lags markets)',
+            source=gold_proxy_source,
+            cadence=gold_proxy_cadence,
+            degraded=gold_proxy_degraded,
         ),
         gold_watch_signal(
             key='dollar_index_change',
@@ -790,6 +839,8 @@ def build_gold_reset_watch(
         alerts.append('Gold volatility is in alarm while Bitcoin is in a deep drawdown: this is the Hypothesis 2 impairment branch, not the adoption branch.')
     if gold_proxy_status == 'alarm' and cert_status == 'ok':
         alerts.append('Gold is repricing sharply while the certificate account is unchanged: context only, not reset evidence.')
+    if gold_proxy_degraded:
+        alerts.append('Daily gold ETF proxy was unavailable this run; the gold card fell back to the lagging monthly index and should be read as degraded.')
     if any(status == 'stale' for status in signal_statuses):
         alerts.append('One or more gold-watch inputs are stale; confirm from the primary release before drawing conclusions.')
 
@@ -810,6 +861,66 @@ def build_gold_reset_watch(
         'guardrail': 'International evidence suggests revaluation can provide financing but cannot by itself solve persistent deficits. Gold price strength and instability are not evidence of an impending reset; mechanism and statement evidence are.',
         'excluded_from_composite': True,
     }
+
+
+def parse_yahoo_chart(payload: dict[str, Any], series_id: str) -> list[dict[str, Any]]:
+    """Convert a Yahoo chart JSON payload into dashboard points.
+
+    Null closes (market holidays, halts) are dropped rather than forward-filled
+    so a percent-change read is never computed against an invented price.
+    """
+    try:
+        results = payload['chart']['result']
+    except (KeyError, TypeError):
+        return []
+    if not results:
+        return []
+    result = results[0] or {}
+    timestamps = result.get('timestamp') or []
+    quotes = (result.get('indicators') or {}).get('quote') or [{}]
+    closes = (quotes[0] or {}).get('close') or []
+    points: list[dict[str, Any]] = []
+    for timestamp, close in zip(timestamps, closes):
+        if close is None:
+            continue
+        try:
+            observed = datetime.fromtimestamp(int(timestamp), timezone.utc).date().isoformat()
+            value = float(close)
+        except (TypeError, ValueError, OSError):
+            continue
+        if not math.isfinite(value):
+            continue
+        points.append(make_point(observed, value, 'present', series_id))
+    points.sort(key=lambda point: point['date'])
+    return points
+
+
+def fetch_yahoo_daily_close(symbol: str, lookback_days: int = 400) -> list[dict[str, Any]]:
+    range_param = '1y' if lookback_days <= 370 else '2y'
+    url = f'{YAHOO_CHART_URL}{symbol}?range={range_param}&interval=1d'
+    request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(request, timeout=YAHOO_TIMEOUT_SECONDS) as response:
+        payload = json.loads(response.read().decode('utf-8', 'ignore'))
+    return parse_yahoo_chart(payload, symbol)
+
+
+def fetch_gold_spot_proxy() -> tuple[list[dict[str, Any]], str | None]:
+    """Best-effort daily gold proxy. Never raises.
+
+    Returns ([], None) when every symbol fails so the nightly Pages build keeps
+    working from a blocked CI runner; the gold card then degrades visibly to the
+    monthly trade index instead of silently reporting nothing.
+    """
+    for symbol in GOLD_ETF_SYMBOLS:
+        try:
+            points = fetch_yahoo_daily_close(symbol)
+        except Exception as exc:  # noqa: BLE001 - optional source must not break the build
+            print(f'gold proxy: {symbol} unavailable ({exc})')
+            continue
+        if len(points) >= 2:
+            return points, symbol
+        print(f'gold proxy: {symbol} returned insufficient data')
+    return [], None
 
 
 def make_point(date_value: str, value: float | None, status: str = 'present', series_id: str | None = None) -> dict[str, Any]:
@@ -907,7 +1018,19 @@ def latest_observations_from_histories(histories: dict[str, list[dict[str, Any]]
     observations: dict[str, dict[str, Any]] = {}
     for series_id, points in histories.items():
         latest = latest_point(points)
-        config = SERIES_CONFIG[series_id]
+        config = SERIES_CONFIG.get(series_id)
+        if config is None:
+            # Non-FRED optional series (daily gold ETF): carry the real ticker
+            # as series_id so the card can name its actual source.
+            symbol = latest.get('series_id') or GOLD_ETF_SYMBOLS[0]
+            observations[series_id] = {
+                'series_id': symbol,
+                'label': f'{symbol} daily close',
+                'date': latest.get('date', ''),
+                'value': latest.get('value'),
+                'status': 'present' if latest.get('value') is not None else 'missing',
+            }
+            continue
         observations[series_id] = {
             'series_id': series_id,
             'label': config['label'],
@@ -1325,6 +1448,22 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         },
     ]
 
+    gold_reset_watch = build_gold_reset_watch(observations, histories, as_of)
+
+    if gold_reset_watch['mechanism_status'] == 'missing':
+        gold_hero_value = 'No data'
+    elif gold_reset_watch['mechanism_status'] == 'alarm':
+        gold_hero_value = 'Mechanism engaged'
+    else:
+        gold_hero_value = 'No mechanism change'
+    gold_alert_count = len(gold_reset_watch['alerts'])
+    # Keep hero notes short: this grid sizes its rows to the longest note.
+    gold_hero_note = (
+        'Mechanism gate clear'
+        if gold_alert_count == 0
+        else f'{gold_alert_count} alert' + ('' if gold_alert_count == 1 else 's') + ' this week'
+    )
+
     hero_cards = [
         {
             'label': 'Overall regime',
@@ -1333,22 +1472,22 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
             'status': overall_status,
         },
         {
-            'label': 'US 10Y',
-            'value': format_value(dgs10['value'], '%'),
-            'note': 'Primary duration-pressure anchor',
-            'status': us10_status,
-        },
-        {
-            'label': 'US 30Y',
-            'value': format_value(dgs30['value'], '%'),
-            'note': 'Long-end fiscal and term-premium stress anchor',
-            'status': us30_status,
+            'label': 'US 10Y / 30Y',
+            'value': f"{format_value(dgs10['value'], '%')} / {format_value(dgs30['value'], '%')}",
+            'note': 'Duration and long-end fiscal stress',
+            'status': max_status([us10_status, us30_status]),
         },
         {
             'label': '2s10s',
             'value': format_value(curve_2s10s, 'pp'),
             'note': 'Recession vs bear-steepener lens',
             'status': curve_2s10s_status,
+        },
+        {
+            'label': 'Gold watch',
+            'value': gold_hero_value,
+            'note': gold_hero_note,
+            'status': gold_reset_watch['status'],
         },
     ]
 
@@ -1379,11 +1518,15 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         ],
     }
 
-    gold_reset_watch = build_gold_reset_watch(observations, histories, as_of)
-
+    gold_etf_history = histories.get(GOLD_ETF_KEY) or []
+    gold_etf_symbol = (observations.get(GOLD_ETF_KEY) or {}).get('series_id') or GOLD_ETF_SYMBOLS[0]
     gold_history_specs = [
         ('gold_certificate_level', 'Fed gold certificate account', 'usd_mn', 'WGCAL'),
-        ('gold_price_proxy', 'Nonmonetary gold export price index', 'index', 'IQ12260'),
+        (
+            ('gold_price_proxy', f'Gold price proxy ({gold_etf_symbol} daily close)', 'usd', GOLD_ETF_KEY)
+            if len(gold_etf_history) >= 2
+            else ('gold_price_proxy', 'Nonmonetary gold export price index', 'index', 'IQ12260')
+        ),
         ('dollar_index', 'Nominal broad U.S. dollar index', 'index', 'DTWEXBGS'),
         ('gold_volatility', 'CBOE gold ETF volatility index', 'level', 'GVZCLS'),
         ('bitcoin_usd', 'Bitcoin (Coinbase USD)', 'usd', 'CBBTCUSD'),
@@ -1392,8 +1535,9 @@ def build_dashboard_payload(observations: dict[str, dict[str, Any]], histories: 
         points = histories.get(series_id) or []
         if not points:
             continue
+        color = SERIES_CONFIG[series_id]['color'] if series_id in SERIES_CONFIG else '#facc15'
         history['series'].append(
-            build_history_series(key, label, unit, SERIES_CONFIG[series_id]['color'], points, [])
+            build_history_series(key, label, unit, color, points, [])
         )
 
     latest_dates = [item['latest_date'] for item in indicators if item['latest_date']]
@@ -1516,6 +1660,11 @@ def build_live_payload(generated_at: str | None = None) -> dict[str, Any]:
     for series_id in GOLD_WATCH_SERIES:
         histories[series_id] = with_status(histories.get(series_id, []), lambda value: 'present')
 
+    # Optional daily gold proxy (only non-FRED source; failure degrades the card).
+    gold_points, gold_symbol = fetch_gold_spot_proxy()
+    if gold_points and gold_symbol:
+        histories[GOLD_ETF_KEY] = with_status(gold_points, lambda value: 'present')
+
     histories['DGS10'] = with_status(histories['DGS10'], lambda value: classify_banded(value, watch_high=4.25, alarm_high=4.75))
     histories['DGS30'] = with_status(histories['DGS30'], lambda value: classify_banded(value, watch_high=4.75, alarm_high=5.10))
     histories['T10Y3M'] = with_status(histories['T10Y3M'], lambda value: classify_banded(value, watch_low=0.0, alarm_low=-0.25, watch_high=1.00, alarm_high=1.25))
@@ -1535,7 +1684,7 @@ def start_cutoff(series_id: str) -> str:
     now = datetime.now(timezone.utc)
     if series_id in {'DGS10', 'DGS2', 'DGS30', 'T10Y3M', 'T10YIE'}:
         return (now - timedelta(days=LOOKBACK_DAYS)).date().isoformat()
-    if series_id in {'WGCAL', 'GVZCLS', 'DTWEXBGS', 'CBBTCUSD', 'IQ12260'}:
+    if series_id in {'WGCAL', 'GVZCLS', 'DTWEXBGS', 'CBBTCUSD', 'IQ12260', GOLD_ETF_KEY}:
         return (now - timedelta(days=LOOKBACK_DAYS)).date().isoformat()
     return (now - timedelta(days=900)).date().isoformat()
 

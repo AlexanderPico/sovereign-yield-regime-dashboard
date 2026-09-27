@@ -310,7 +310,7 @@
           </div>
           <span class="tag ${statusClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
         </div>
-        <div class="gold-tag">${escapeHtml(item.hypothesis || '')}</div>
+        <div class="gold-tag">${escapeHtml(item.hypothesis || '')}</div>${item.degraded ? '<div class="gold-tag gold-tag-degraded">degraded source</div>' : ''}
         <p>${escapeHtml(item.why || '')}</p>
         <div class="indicator-meta">
           <div><strong>Latest:</strong> ${escapeHtml(item.latest_date || 'n/a')}</div>

@@ -4,6 +4,8 @@ import re
 import sys
 from datetime import datetime, timezone
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = REPO_ROOT / 'scripts' / 'build_dashboard_data.py'
@@ -98,6 +100,7 @@ def gold_watch_observations(**overrides):
         'DTWEXBGS': {'series_id': 'DTWEXBGS', 'label': 'Broad dollar index', 'date': '2026-05-14', 'value': 119.5, 'status': 'present'},
         'GVZCLS': {'series_id': 'GVZCLS', 'label': 'Gold volatility', 'date': '2026-05-14', 'value': 23.6, 'status': 'present'},
         'CBBTCUSD': {'series_id': 'CBBTCUSD', 'label': 'Bitcoin', 'date': '2026-05-14', 'value': 84000.0, 'status': 'present'},
+        'GLD_DAILY': {'series_id': 'GLD', 'label': 'GLD daily close', 'date': '2026-05-14', 'value': 340.0, 'status': 'present'},
     }
     base.update(overrides)
     return base
@@ -129,6 +132,10 @@ def gold_watch_history(**overrides):
         'CBBTCUSD': [
             {'date': '2026-02-12', 'value': 86000.0, 'status': 'present'},
             {'date': '2026-05-14', 'value': 84000.0, 'status': 'present'},
+        ],
+        'GLD_DAILY': [
+            {'date': '2026-02-12', 'value': 330.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 340.0, 'status': 'present'},
         ],
     }
     base.update(overrides)
@@ -204,14 +211,18 @@ def test_flat_gold_certificate_account_refuses_to_call_a_reset():
 
 
 def test_rising_gold_alone_is_context_not_reset_evidence():
+    # Sharp gold repricing on the daily ETF proxy (300 -> 375 is +25%).
     histories = gold_watch_history(**{
-        'IQ12260': [
-            {'date': '2026-01-01', 'value': 120.0, 'status': 'present'},
-            {'date': '2026-02-01', 'value': 130.0, 'status': 'present'},
-            {'date': '2026-04-01', 'value': 155.1, 'status': 'present'},
+        'GLD_DAILY': [
+            {'date': '2026-02-12', 'value': 300.0, 'status': 'present'},
+            {'date': '2026-04-14', 'value': 340.0, 'status': 'present'},
+            {'date': '2026-05-14', 'value': 375.0, 'status': 'present'},
         ],
     })
-    _, watch = build_gold_watch(histories=histories)
+    observations = gold_watch_observations(**{
+        'GLD_DAILY': {'series_id': 'GLD', 'label': 'GLD daily close', 'date': '2026-05-14', 'value': 375.0, 'status': 'present'},
+    })
+    _, watch = build_gold_watch(observations=observations, histories=histories)
     proxy = next(item for item in watch['signals'] if item['key'] == 'gold_price_proxy_change')
     assert proxy['status'] == 'alarm'
     assert proxy['hypothesis'] == 'Context'
@@ -285,6 +296,130 @@ def test_bitcoin_impairment_branch_is_distinguished_from_adoption():
     assert any('impairment branch' in alert for alert in watch['alerts'])
 
 
+def gold_spot_history_points():
+    # Daily ETF closes: 3-month change from 300 -> 360 is +20%.
+    return [
+        {'date': '2026-02-12', 'value': 300.0, 'status': 'present'},
+        {'date': '2026-03-16', 'value': 320.0, 'status': 'present'},
+        {'date': '2026-04-14', 'value': 340.0, 'status': 'present'},
+        {'date': '2026-05-14', 'value': 360.0, 'status': 'present'},
+    ]
+
+
+def test_daily_gold_etf_is_preferred_over_monthly_trade_index():
+    observations = gold_watch_observations(**{
+        'GLD_DAILY': {'series_id': 'GLD', 'label': 'SPDR Gold Shares', 'date': '2026-05-14', 'value': 360.0, 'status': 'present'},
+    })
+    histories = gold_watch_history(**{'GLD_DAILY': gold_spot_history_points()})
+    _, watch = build_gold_watch(observations=observations, histories=histories)
+
+    proxy = next(item for item in watch['signals'] if item['key'] == 'gold_price_proxy_change')
+    # Daily ETF math wins over the stale monthly index.
+    assert proxy['value'] == pytest.approx(20.0)
+    assert proxy['status'] == 'alarm'
+    assert proxy['latest_date'] == '2026-05-14'
+    assert 'GLD' in proxy['source']
+    assert proxy['degraded'] is False
+    assert 'daily' in proxy['cadence'].lower()
+
+    # Daily gold must also be chartable.
+    payload, _ = build_gold_watch(observations=observations, histories=histories)
+    history_keys = {item['key'] for item in payload['history']['series']}
+    assert 'gold_price_proxy' in history_keys
+
+
+def test_gold_card_degrades_to_monthly_index_when_etf_unavailable():
+    # Drop the daily ETF entirely: the panel must still work, and must say it is degraded.
+    observations = {k: v for k, v in gold_watch_observations().items() if k != 'GLD_DAILY'}
+    histories = {k: v for k, v in gold_watch_history().items() if k != 'GLD_DAILY'}
+    _, watch = build_gold_watch(observations=observations, histories=histories)
+    proxy = next(item for item in watch['signals'] if item['key'] == 'gold_price_proxy_change')
+    assert proxy['degraded'] is True
+    assert 'IQ12260' in proxy['source']
+    assert 'monthly' in proxy['cadence'].lower()
+    # Degradation must be visible, not silent.
+    assert 'fallback' in proxy['why'].lower() or 'fallback' in proxy['cadence'].lower()
+    assert any('degraded' in alert.lower() for alert in watch['alerts'])
+
+
+def test_gold_etf_fetch_failure_does_not_break_the_build(monkeypatch):
+    def boom(*args, **kwargs):
+        raise RuntimeError('yahoo blocked this runner')
+
+    monkeypatch.setattr(module, 'fetch_yahoo_daily_close', boom)
+    points, series_id = module.fetch_gold_spot_proxy()
+    assert points == []
+    assert series_id is None
+
+
+def test_yahoo_chart_payload_parses_into_points():
+    chart = {
+        'chart': {
+            'result': [
+                {
+                    'meta': {'symbol': 'GLD', 'currency': 'USD'},
+                    'timestamp': [1770854400, 1770940800, 1771027200],
+                    'indicators': {'quote': [{'close': [300.0, None, 310.5]}]},
+                }
+            ],
+            'error': None,
+        }
+    }
+    points = module.parse_yahoo_chart(chart, 'GLD')
+    # Null closes (holidays/halts) are dropped, not forward-filled.
+    assert [point['value'] for point in points] == [300.0, 310.5]
+    assert all(point['series_id'] == 'GLD' for point in points)
+    assert points[0]['date'] < points[-1]['date']
+
+    assert module.parse_yahoo_chart({'chart': {'result': [], 'error': 'nope'}}, 'GLD') == []
+    assert module.parse_yahoo_chart({}, 'GLD') == []
+
+
+def test_hero_cards_combine_us_duration_and_summarize_gold_watch():
+    payload, watch = build_gold_watch()
+    hero = payload['hero_cards']
+    assert len(hero) == 4
+
+    labels = [card['label'] for card in hero]
+    assert labels[0] == 'Overall regime'
+    # US 10Y and 30Y share one duration card instead of two.
+    assert labels[1] == 'US 10Y / 30Y'
+    assert labels[2] == '2s10s'
+    assert labels[3] == 'Gold watch'
+    assert 'US 10Y' not in labels
+    assert 'US 30Y' not in labels
+
+    duration = hero[1]
+    # Both yields must still be readable at a glance.
+    assert '5.18%' in duration['value']
+    assert '4.95%' in duration['value'] or '4.95' in duration['value']
+    # Worst of the two drives the card colour.
+    us10 = next(item for item in payload['indicators'] if item['key'] == 'us_10y_yield')
+    us30 = next(item for item in payload['indicators'] if item['key'] == 'us_30y_yield')
+    assert duration['status'] == module.max_status([us10['status'], us30['status']])
+
+    gold = hero[3]
+    assert gold['status'] == watch['status']
+    # The hero card must reflect the mechanism gate, not the price backdrop.
+    assert 'mechanism' in gold['note'].lower()
+
+
+def test_gold_hero_card_reports_mechanism_engaged_when_certificate_moves():
+    histories = gold_watch_history(**{
+        'WGCAL': [
+            {'date': '2026-04-15', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-22', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-04-29', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-06', 'value': 11037.0, 'status': 'present'},
+            {'date': '2026-05-13', 'value': 750000.0, 'status': 'present'},
+        ],
+    })
+    payload, _ = build_gold_watch(histories=histories)
+    gold = payload['hero_cards'][3]
+    assert gold['status'] == 'alarm'
+    assert 'engaged' in gold['value'].lower()
+
+
 def test_stale_weekly_gold_certificate_print_is_flagged():
     as_of = datetime(2026, 5, 15, 12, 0, tzinfo=timezone.utc)
     assert module.freshness_status('2026-05-13', 'weekly', as_of) == 'fresh'
@@ -337,8 +472,9 @@ def test_build_dashboard_payload_flags_alarm_regime_and_summary_counts():
     assert payload['summary']['alarm_count'] >= 4
     assert payload['summary']['warning_count'] >= 2
     assert payload['hero_cards'][0]['label'] == 'Overall regime'
-    assert payload['hero_cards'][1]['label'] == 'US 10Y'
-    assert payload['hero_cards'][2]['label'] == 'US 30Y'
+    # Hero layout: US duration is one combined card; see the dedicated hero test.
+    assert payload['hero_cards'][1]['label'] == 'US 10Y / 30Y'
+    assert payload['hero_cards'][3]['label'] == 'Gold watch'
     assert 'inflation' in payload['regime_cards'][0]['drivers'].lower()
 
     composite = payload['composite_regime']

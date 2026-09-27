@@ -250,6 +250,11 @@ h2 { font-size: 1.3rem; margin-bottom: 0; }
   text-transform: uppercase;
   color: #cbd5e1;
 }
+.gold-tag-degraded {
+  margin-left: 6px;
+  border-color: rgba(245, 158, 11, 0.55);
+  color: var(--watch);
+}
 .gold-falsify { margin-top: 8px; opacity: 0.88; }
 .gold-hypothesis-grid,
 .gold-check-grid {
