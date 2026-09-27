@@ -22,7 +22,7 @@ jobs:
         run: python3 -m pip install pytest
 
       - name: Run regression tests
-        run: pytest tests/test_build_dashboard_data.py -q
+        run: pytest tests/ -q
 
       - name: Rebuild dashboard data
         run: python3 scripts/build_dashboard_data.py

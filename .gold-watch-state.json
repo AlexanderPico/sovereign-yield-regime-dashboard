@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-09-27T18:35:53Z",
+  "snapshot": {
+    "mechanism_status": "ok",
+    "central_status": "ok",
+    "central_answer": "Unanswered, and correctly so. Neither reading is supported until the mechanism itself changes.",
+    "hypotheses": {
+      "h1_monetary_expansion": "ok",
+      "h2_crisis_adoption": "ok"
+    },
+    "signals": {
+      "gold_certificate_deviation": {
+        "band": "ok",
+        "degraded": false
+      },
+      "gold_price_proxy_change": {
+        "band": "ok",
+        "degraded": false
+      },
+      "dollar_index_change": {
+        "band": "ok",
+        "degraded": false
+      },
+      "gold_volatility": {
+        "band": "ok",
+        "degraded": false
+      },
+      "bitcoin_3m_change": {
+        "band": "ok",
+        "degraded": false
+      }
+    },
+    "alerts": []
+  }
+}

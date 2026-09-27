@@ -47,9 +47,13 @@ Each indicator maps to:
 - `app.js` — client-side renderer
 - `dashboard-data.js` — generated data bundle consumed by the page
 - `scripts/build_dashboard_data.py` — pulls FRED CSV data and writes `dashboard-data.js`
+- `scripts/weekly_gold_watch.py` — weekly Gold Reset Watch change detector and digest
+- `.gold-watch-state.json` — committed prior-week watch state (drives change detection)
 - `tests/test_build_dashboard_data.py` — payload/bundle and repo-contract regression tests
+- `tests/test_weekly_gold_watch.py` — weekly-watch alert-policy regression tests
 - `.github/workflows/ci.yml` — push/PR validation for tests, data rebuild, and JS syntax
 - `.github/workflows/refresh-and-deploy-pages.yml` — scheduled GitHub Pages refresh/deploy
+- `.github/workflows/weekly-gold-watch.yml` — Monday watch run; opens an issue only on a meaningful development
 
 ## Local usage
 
@@ -63,17 +67,27 @@ Run tests:
 
 ```bash
 python3 -m pip install pytest
-pytest tests/test_build_dashboard_data.py -q
+pytest tests/ -q
 ```
 
 Run the same local validation steps used by CI:
 
 ```bash
 python3 -m pip install pytest
-pytest tests/test_build_dashboard_data.py -q
+pytest tests/ -q
 python3 scripts/build_dashboard_data.py
 node --check app.js
 ```
+
+Run the weekly gold watch locally (prints the digest, exits 10 on a meaningful development):
+
+```bash
+python3 scripts/build_dashboard_data.py
+python3 scripts/weekly_gold_watch.py --always-print --no-save
+```
+
+Use `--no-save` for ad-hoc inspection so you do not consume the recorded state that the
+scheduled Monday run diffs against.
 
 Open locally:
 - open `index.html` directly, or
@@ -128,6 +142,9 @@ All current data comes from public FRED CSV endpoints:
 
 - `.github/workflows/ci.yml` runs the secret-free regression path on `push` and `pull_request`.
 - `.github/workflows/refresh-and-deploy-pages.yml` remains the scheduled/manual Pages refresh path.
+- `.github/workflows/weekly-gold-watch.yml` runs the Gold Reset Watch every Monday at `15:40 UTC`
+  (after the weekly `WGCAL` gold-certificate level posts), commits the updated state file, and
+  opens a GitHub issue **only** when the watcher reports a meaningful development.
 
 ## Gold Reset Watch (weekly)
 
@@ -167,6 +184,26 @@ The design is mechanism-first:
 Every watch card states both what would confirm it and what would falsify it. Alerts fire only
 when the mechanism moves, when a hypothesis leg crosses its threshold, or when an input goes
 stale — price moves alone do not qualify. Weekly prints go stale after 14 calendar days.
+
+### Weekly watch automation
+
+`scripts/weekly_gold_watch.py` turns the panel into an actual weekly watch with quiet-by-default
+alerting. It diffs the current lens against `.gold-watch-state.json` (the committed prior-week
+state) and treats only these as meaningful developments:
+
+- the mechanism gate changes status
+- the central-question verdict changes
+- a hypothesis leg changes status
+- a signal crosses into or out of watch/alarm
+- an input goes stale/missing, or the daily gold proxy starts or stops running degraded
+- a new alert string appears
+
+Gold drifting from +5% to +9% inside the same band is **not** a development and exits `0`
+silently. Exit `10` means surface it; exit `2` means the bundle is malformed. The first run only
+records a baseline and never alerts, so a fresh clone cannot fire a false positive.
+
+Repeated alert strings are not re-reported week over week, which is what keeps the watch from
+becoming background noise you learn to ignore.
 
 Guardrail carried on the panel: international evidence suggests revaluation can provide financing
 but cannot by itself solve persistent deficits.

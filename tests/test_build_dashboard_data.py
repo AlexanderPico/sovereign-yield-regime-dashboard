@@ -643,11 +643,23 @@ def test_repo_docs_and_ci_stay_in_sync_with_supported_series():
     assert ci_workflow_path.exists()
     assert refresh_workflow_path.exists()
 
+    # The weekly gold watch is part of the repo contract: the script, its state
+    # file, its tests, and its scheduled workflow must stay wired together.
+    watch_workflow_path = REPO_ROOT / '.github' / 'workflows' / 'weekly-gold-watch.yml'
+    assert watch_workflow_path.exists()
+    watch_workflow = watch_workflow_path.read_text()
+    assert 'scripts/weekly_gold_watch.py' in watch_workflow
+    assert 'schedule:' in watch_workflow
+    assert (REPO_ROOT / 'scripts' / 'weekly_gold_watch.py').exists()
+    assert (REPO_ROOT / 'tests' / 'test_weekly_gold_watch.py').exists()
+    assert 'scripts/weekly_gold_watch.py' in readme_text
+    assert '.gold-watch-state.json' in readme_text
+
     ci_workflow = ci_workflow_path.read_text()
     assert 'pull_request:' in ci_workflow
     assert 'push:' in ci_workflow
     assert 'python3 -m pip install pytest' in ci_workflow
-    assert 'pytest tests/test_build_dashboard_data.py -q' in ci_workflow
+    assert 'pytest tests/ -q' in ci_workflow
     assert 'python3 scripts/build_dashboard_data.py' in ci_workflow
     assert 'node --check app.js' in ci_workflow
 

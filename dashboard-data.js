@@ -1,5 +1,5 @@
 globalThis.SOVEREIGN_YIELD_DASHBOARD_DATA = {
-  "generated_at": "2026-09-27T17:26:13Z",
+  "generated_at": "2026-09-27T18:36:24Z",
   "title": "Sovereign Yield Regime Dashboard",
   "summary": {
     "overall_status": "alarm",
