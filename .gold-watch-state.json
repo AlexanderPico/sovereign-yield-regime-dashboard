@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-09-27T18:35:53Z",
+  "as_of": "2026-09-28T21:21:57Z",
   "snapshot": {
     "mechanism_status": "ok",
     "central_status": "ok",
     "central_answer": "Unanswered, and correctly so. Neither reading is supported until the mechanism itself changes.",
     "hypotheses": {
       "h1_monetary_expansion": "ok",
-      "h2_crisis_adoption": "ok"
+      "h2_crisis_adoption": "degraded"
     },
     "signals": {
       "gold_certificate_deviation": {
@@ -22,7 +22,7 @@
         "degraded": false
       },
       "gold_volatility": {
-        "band": "ok",
+        "band": "degraded",
         "degraded": false
       },
       "bitcoin_3m_change": {
@@ -30,6 +30,8 @@
         "degraded": false
       }
     },
-    "alerts": []
+    "alerts": [
+      "One or more gold-watch inputs are stale; confirm from the primary release before drawing conclusions."
+    ]
   }
 }
